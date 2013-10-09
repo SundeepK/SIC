@@ -43,7 +43,8 @@ public class MyActivity extends Activity {
 		
 		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder(getApplicationContext())
 		.setMaxCacheMemorySize(2) // 1 mb default
-		.setDirectoryName("/storage/sdcard0/Pictures/cache") // by default, a new directory will be created 
+		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
+		// by default, a new directory will be created 
 		// in the Pictures folder in the SD card if one exists, else internal sotrage is used
 		.setImageQuality(60) // default image quality is 100, lower settings are recomended for thumbnails
 		.shouldLog(true) // default is false, allows for some useful logging
