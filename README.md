@@ -46,15 +46,20 @@ public class MyActivity extends Activity {
 		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
 		// by default, a new directory will be created 
 		// in the Pictures folder in the SD card if one exists, else internal sotrage is used
-		.setImageQuality(60) // default image quality is 100, lower settings are recomended for thumbnails
-		.shouldLog(true) // default is false, allows for some useful logging
+		.setImageQuality(60) 
+		// default image quality is 100, lower settings are recomended for thumbnails
+		.shouldLog(true) 
+		// default is false, allows for some useful logging
 		.setImageType(CompressFormat.JPEG) // default compression type is JPEG
-		.setImageConfig(Bitmap.Config.ARGB_4444) // default is Bitmap.Config.ARGB_8888
+		.setImageConfig(Bitmap.Config.ARGB_4444) 
+		// default is Bitmap.Config.ARGB_8888
 		.setThreadExecutor(new ThreadPoolExecutor(4, 10, 120, TimeUnit.SECONDS,
 		                new LinkedBlockingQueue<Runnable>()))
-		// default is new ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
-		.useExternalStorage(true) // default is true
-		.setOnloadingImage(new ColorDrawable(Color.Black)) // default is a black Drawable,
+		// default is ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
+		.useExternalStorage(true)
+		// default is true
+		.setOnloadingImage(new ColorDrawable(Color.Black)) 
+		// default is a black Drawable,
 		this is also used when nothing can be loaded
 		.build(); 
 		UrlImageLoader.getInstance().init(configs);
