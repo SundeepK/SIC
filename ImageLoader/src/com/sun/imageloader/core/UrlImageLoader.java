@@ -2,12 +2,9 @@ package com.sun.imageloader.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import android.R;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
-
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;

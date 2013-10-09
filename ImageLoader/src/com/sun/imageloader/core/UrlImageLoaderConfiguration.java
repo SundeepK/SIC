@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import android.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -121,12 +119,12 @@ final public class UrlImageLoaderConfiguration {
 		}
 		
 		public Builder setImageType(CompressFormat compressFormat_){
-			this._compressFormat = compressFormat_;
+			this._compressFormat = compressFormat_; 
 			return this;
 		}
 		
 		public Builder setImageConfig(Bitmap.Config config_){
-			this._configType = config_;
+			this._configType = config_; 
 			return this;
 		}
 		
