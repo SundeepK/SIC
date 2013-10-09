@@ -27,7 +27,7 @@ public class MyActivity extends Activity {
 		.build();
 		UrlImageLoader.getInstance().init(configs);
 		UrlImageLoader sicImageLoader = UrlImageLoader.getInstance();
-		sicImageLoader.displayImage("https://some.where.com/some_random_image.jpg", someImageView, 4); 
+		sicImageLoader.displayImage("https://some.where.com/random_image.jpg", someImageView, 4); 
 		// param's: the URL, ImageView, sampleSize
 		
 	}
