@@ -6,7 +6,7 @@ SIC (Simple Image Cache for Android)
 SIC is a simple light weight image caching library that will load images from a URL asynchronously.
 
 ## What does it do?
- *Well aaah... it caches images for you in memory
+	*Well aaah... it caches images for you in memory
  *Built with multi threading in mind, it will retreive images from a network call or from the disk if it exists
  *It's light weight so it doesn't intrude on your apps memory footprint
  
