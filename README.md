@@ -61,8 +61,7 @@ public class MyActivity extends Activity {
 		.useExternalStorage(true)
 		// default is true
 		.setOnloadingImage(new ColorDrawable(Color.Black)) 
-		// default is a black Drawable,
-		this is also used when nothing can be loaded
+		// default is a black Drawable, this is also used when nothing can be loaded
 		.build(); 
 		UrlImageLoader.getInstance().init(configs);
 		UrlImageLoader sicImageLoader = UrlImageLoader.getInstance();
