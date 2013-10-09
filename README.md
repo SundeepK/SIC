@@ -1,11 +1,17 @@
 SIC
 ===
-SIC (Simple Image Cache for Android) is a simple light weight image caching library that will load images from a URL asynchronously.
+SIC (Simple Image Cache for Android) is a simple light weight image caching library that will load images from a URL asynchronously. Thi
 
 ## What does it do?
 * Well aaah... it caches images for you in memory
 * Built with multi threading in mind, it will retreive images from a network call or from the disk if it exists
 * It's light weight so it doesn't intrude on your apps memory footprint
+
+## Enhancements
+* Support for loading from file system via a URI
+* Cache gif's in memory
+* Unit test's
+* Stress test with large number or images
  
 ## Configuration
  
@@ -21,7 +27,8 @@ public class MyActivity extends Activity {
 		.build();
 		UrlImageLoader.getInstance().init(configs);
 		UrlImageLoader sicImageLoader = UrlImageLoader.getInstance();
-		sicImageLoader.displayImage("https://some.where.com/some_random_image.jpg", someImageView, 4);
+		sicImageLoader.displayImage("https://some.where.com/some_random_image.jpg", someImageView, 4); 
+		// param's: the URL, ImageView, sampleSize
 		
 	}
 }
