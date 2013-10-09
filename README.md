@@ -56,7 +56,8 @@ public class MyActivity extends Activity {
 		// default is Bitmap.Config.ARGB_8888
 		.setThreadExecutor(new ThreadPoolExecutor(4, 10, 120, TimeUnit.SECONDS,
 		                new LinkedBlockingQueue<Runnable>()))
-		// default is ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
+		// default is ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS, 
+		//new LinkedBlockingQueue<Runnable>())
 		.useExternalStorage(true)
 		// default is true
 		.setOnloadingImage(new ColorDrawable(Color.Black)) 
