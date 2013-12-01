@@ -35,8 +35,12 @@ public class DisplayImageTask implements Runnable {
 	@Override
 	public void run() {
 		_taskListener.preImageLoad(_imageSettings);
-		if(_imageSettings.getImageKey() == _imageViewMap.get(_imageSettings.getImageView().hashCode())){
+		
+		if(_imageSettings == null){
+			
+	    }else if(_imageSettings.getImageKey() == _imageViewMap.get(_imageSettings.getImageView().hashCode())){
 			_imageSettings.getImageView().setImageBitmap(_bitmap);
+			_imageViewMap.remove(_imageSettings.getImageView().hashCode());
 		}
 		_taskListener.onImageLoadComplete(_bitmap, _imageSettings);
 		

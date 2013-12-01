@@ -5,7 +5,7 @@ import com.sun.imageloader.core.ImageSettings;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-public interface ImageTaskListener {
+public interface ImageTaskListener extends ImageFailListenter {
 
 	
 	
@@ -27,13 +27,6 @@ public interface ImageTaskListener {
 	 */
 	public void onImageLoadComplete(Bitmap bitmap_, ImageSettings imageSettings_);
 	
-	/**
-	 * Listener method to invoke when an image was not successfully loaded. Override this to handle {@link Exception} that may have 
-	 * occured during image loading.
-	 * 
-	 * @param failureReason_
-	 * @param imageSettings_
-	 */
-	public void onImageLoadFail(FailedTaskReason failureReason_, ImageSettings imageSettings_);
+
 	
 }

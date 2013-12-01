@@ -104,8 +104,9 @@ final public class UrlImageLoaderConfiguration {
 			return this;
 		}
 		
-		public void setDirectoryName(String directoryName_){
+		public Builder setDirectoryName(String directoryName_){
 			this._directoryName = directoryName_;
+			return this;
 		}
 		
 		public Builder setImageQuality(int quality_){

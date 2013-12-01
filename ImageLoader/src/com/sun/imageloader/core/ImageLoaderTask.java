@@ -80,6 +80,8 @@ public class ImageLoaderTask implements Runnable {
 		if (decodedImage != null) {
 			_lruCache.put(_imageSettings.getImageKey(), decodedImage);
 			postDisplayImage(decodedImage);
+		}else{
+			_configs._viewKeyMap.remove(_imageSettings.getImageView().hashCode());
 		}
 
 	}
@@ -94,6 +96,10 @@ public class ImageLoaderTask implements Runnable {
 		Lock lock = _readWriteLock.getReadWriteLock(_imageSettings.getImageKey());
 		try {
 			lock.lock();
+			ImageKey imageKey = _imageSettings.getImageKey();
+			if(imageKey != _configs._viewKeyMap.get(_imageSettings.getImageView().hashCode())){
+				return null;
+			}
 			imageToRetreive = tryLoadImageFromDisk();
 
 			if (imageToRetreive == null) {
@@ -166,7 +172,7 @@ public class ImageLoaderTask implements Runnable {
 		if(imageKey != _configs._viewKeyMap.get(_imageSettings.getImageView().hashCode())){
 			return null;
 		}
-		
+
 		Bitmap cachedImage = _lruCache.getValue(imageKey);
 
 		if (cachedImage != null) {
