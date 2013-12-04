@@ -40,6 +40,13 @@ public class UrlImageLoader {
 		}
 		return urlImageLoaderInstance;
 	}
+	
+	public void invalidate(){
+			synchronized (UrlImageLoader.class) {
+					urlImageLoaderInstance = null;
+					_ImageLoaderConfig = null;
+		}
+	}
 
 	protected UrlImageLoader() {
 	}
