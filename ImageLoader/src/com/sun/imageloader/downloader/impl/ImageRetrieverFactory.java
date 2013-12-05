@@ -12,7 +12,7 @@ public final class ImageRetrieverFactory {
 	
 	private static synchronized ImageDownloader  getImageDownloader(URI imageUrl_, int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
 		if(_imageLoader == null){
-			_imageLoader = new ImageDownloader(imageUrl_, maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
+			_imageLoader = new ImageDownloader(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
 		}
 		return _imageLoader;
 	}
