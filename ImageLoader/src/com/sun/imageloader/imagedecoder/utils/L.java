@@ -3,9 +3,9 @@ package com.sun.imageloader.imagedecoder.utils;
 import android.util.Log;
 
 public final class L {
-
+	//check this to enable logging
 	private static boolean SHOULD_LOG = false;
-	
+
 	public static void shouldLog(boolean shouldLog_){
 		SHOULD_LOG = shouldLog_;
 	}
