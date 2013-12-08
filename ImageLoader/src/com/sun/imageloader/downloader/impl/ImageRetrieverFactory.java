@@ -8,11 +8,11 @@ import com.sun.imageloader.imagedecoder.utils.L;
 public final class ImageRetrieverFactory {
 
 	private static final String TAG =  ImageRetrieverFactory.class.getName();
-	private static ImageDownloader _imageLoader;
+	private static ImageDownloader2 _imageLoader;
 	
-	private static synchronized ImageDownloader  getImageDownloader(URI imageUrl_, int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
+	private static synchronized ImageDownloader2 getImageDownloader(URI imageUrl_, int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
 		if(_imageLoader == null){
-			_imageLoader = new ImageDownloader(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
+			_imageLoader = new ImageDownloader2(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
 		}
 		return _imageLoader;
 	}
