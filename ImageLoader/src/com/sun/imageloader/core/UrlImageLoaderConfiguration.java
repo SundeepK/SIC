@@ -61,7 +61,6 @@ final public class UrlImageLoaderConfiguration {
 	
 	public static class Builder {
 		
-		private Context _context;
 		private int _maxCacheMemorySizeInMB;
 		private MemoryCache<ImageKey, Bitmap> _memoryCache;
 		private Handler _imageViewUpdateHandler;
@@ -80,12 +79,8 @@ final public class UrlImageLoaderConfiguration {
 
 		/**
 		 * Builder to construct the {@link UrlImageLoaderConfiguration} used by {@link UrlImageLoader} to retrieve images.
-		 * 
-		 * @param context_
-		 * 			the current application context
 		 */
-		public Builder(Context context_) {
-			_context = context_.getApplicationContext();
+		public Builder() {
 			_imageViewUpdateHandler = new Handler();
 		}
 		
@@ -151,8 +146,8 @@ final public class UrlImageLoaderConfiguration {
 		 * @return
 		 * 		{@link UrlImageLoaderConfiguration}
 		 */		
-		public UrlImageLoaderConfiguration build(){
-			initBuilder();
+		public UrlImageLoaderConfiguration build(Context context_){
+			initBuilder(context_);
 			return new UrlImageLoaderConfiguration(this);
  
 		}
@@ -161,7 +156,7 @@ final public class UrlImageLoaderConfiguration {
 		 * Used to initialise default object used by {@link UrlImageLoader} to retreive images with.
 		 * 
 		 */
-		private void initBuilder(){
+		private void initBuilder(Context context_){
 			if(_maxCacheMemorySizeInMB <= 0){
 				_maxCacheMemorySizeInMB = 1;
 			}
@@ -182,7 +177,7 @@ final public class UrlImageLoaderConfiguration {
 						_imageWriter = new ImageWriter(_diskCacheLocation);
 					
 				}else{
-					_imageWriter = new ImageWriter(getInternalDir());
+					_imageWriter = new ImageWriter(getInternalDir(context_));
 				}
 			}
 			
@@ -217,8 +212,8 @@ final public class UrlImageLoaderConfiguration {
 				
 		}
 		
-		private File getInternalDir(){
-			File storageDir = _context.getFilesDir();
+		private File getInternalDir(Context context_){
+			File storageDir = context_.getFilesDir();
 			L.v(TAG, "Using internal storage, and path to store image: " + storageDir.getAbsolutePath());		
 			return storageDir;
 		}
