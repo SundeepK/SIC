@@ -69,11 +69,10 @@ public class SimpleImageDecoder implements ImageDecoder {
 	 * associated with the image. This will override the sampleSize passed into the {@link ImageSettings} since we want 
 	 * to fit the {@link Bitmap} onto the destination resolution.
 	 * 
-	 * @param bitmapDest_
-	 * @param options_
-	 * @param destWidth_
-	 * @param destHeight_
-	 * @throws IOException 
+	 * @param bitmapStream_ the {@link java.io.InputStream} of the  {@link android.graphics.Bitmap} image to decode
+     * @param options_ the {@link android.graphics.BitmapFactory.Options} associated with the {@link android.graphics.Bitmap}
+     * @param settings_ the {@link com.sun.imageloader.core.ImageSettings} associated with an image which contains the decode settings
+     * @throws IOException
 	 */
 	private Bitmap resizeBitmapToFitDest(InputStream bitmapStream_, Options options_, ImageSettings settings_) throws IOException{
 		bitmapStream_.reset();
