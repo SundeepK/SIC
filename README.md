@@ -25,8 +25,8 @@ public class MyActivity extends Activity {
 	public void onCreate() {
 		super.onCreate();
 		
-		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder(getApplicationContext())
-		.build();
+		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
+		.build(this);
 		UrlImageLoader.getInstance().init(configs);
 		UrlImageLoader sicImageLoader = UrlImageLoader.getInstance();
 		sicImageLoader.displayImage("https://some.where.com/random_image.jpg", someImageView, 4); 
@@ -43,7 +43,7 @@ public class MyActivity extends Activity {
 	public void onCreate() {
 		super.onCreate();
 		
-		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder(getApplicationContext())
+		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
 		.setMaxCacheMemorySize(2) // 1 mb default
 		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
 		// by default, a new directory will be created 
@@ -64,7 +64,7 @@ public class MyActivity extends Activity {
 		// default is true
 		.setOnloadingImage(new ColorDrawable(Color.Black)) 
 		// default is a black Drawable, this is also used when nothing can be loaded
-		.build(); 
+		.build(this); 
 		UrlImageLoader.getInstance().init(configs);
 		UrlImageLoader sicImageLoader = UrlImageLoader.getInstance();
 		sicImageLoader.displayImage("https://some.where.com/some_random_image.jpg", someImageView, 4);
