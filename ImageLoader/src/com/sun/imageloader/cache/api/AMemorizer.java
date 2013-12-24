@@ -33,7 +33,6 @@ public abstract class AMemorizer<T,V> implements IMemorizer<T,V> {
 	
 	protected abstract Callable<V> getCallable(T computable_);
 	
-	
 	@Override
 	public V executeComputable(T computableKey_) throws InterruptedException, ExecutionException {
 		
