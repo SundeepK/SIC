@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.cache.api.ReadWriteImageLock;
+import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.FailedTaskReason;
 import com.sun.imageloader.core.api.FailedTaskReason.ExceptionType;
 import com.sun.imageloader.core.api.ImageTaskListener;
@@ -31,11 +32,11 @@ public class ImageLoaderTask implements Runnable {
 	protected final ImageWriter _imageWriter;
 	protected final ImageRetriever _imageDownloader;
 	protected final ReadWriteImageLock<ImageKey> _readWriteLock;
-	protected final ImageTaskListener _taskListener;
+	protected final MemoryCache<ImageKey, Future<Bitmap>> _futureBimapCache;
 	protected final UrlImageLoaderConfiguration _configs;
 	
 	/**
-	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from eitehr the internal cache, disk or from a network call.
+	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from either the internal cache, disk or from a network call.
 	 * 
 	 * 
 	 * @param imageDecoder_
@@ -47,7 +48,7 @@ public class ImageLoaderTask implements Runnable {
 	 * @param configs_
 	 * 			config which contains references to various internal caches and data structures
 	 * @param taskListener_
-	 * 			listener needed to perform specail operations at certain events
+	 * 			listener needed to perform special operations at certain events
 	 */
 	public ImageLoaderTask(ImageDecoder imageDecoder_,ImageSettings imageSettings_,	ImageRetriever imageDownloader_,
 			UrlImageLoaderConfiguration configs_, ImageTaskListener taskListener_) {
@@ -132,7 +133,7 @@ public class ImageLoaderTask implements Runnable {
 	}
 
 	/**
-	 * Attempt to download the image from a network call adn write to disk
+	 * Attempt to download the image from a network call and write to disk
 	 * 
 	 * @return
 	 * 		{@link Bitmap} of the final decoded image

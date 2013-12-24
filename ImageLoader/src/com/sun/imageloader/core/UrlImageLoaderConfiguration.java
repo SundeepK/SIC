@@ -2,6 +2,7 @@ package com.sun.imageloader.core;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.cache.api.ReadWriteImageLock;
+import com.sun.imageloader.cache.impl.BitmapMemorizer;
 import com.sun.imageloader.cache.impl.DiskCache;
 import com.sun.imageloader.cache.impl.ImageLock;
 import com.sun.imageloader.cache.impl.LRUCache;
@@ -32,7 +34,7 @@ final public class UrlImageLoaderConfiguration {
 	final Handler _imageViewUpdateHandler;
 	final ImageWriter _imageWriter;
 	final MemoryCache<ImageKey, File> _diskCache;
-	final ReadWriteImageLock<ImageKey> _imageReadWriteLock;
+	final MemoryCache<ImageKey, FutureTask<Bitmap>> _futureBitmapCache;
 	final ImageTaskListener _taskListener;
 	final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; // Associate {@link ImageView} and image being loaded using a unique key in an internal {@link SparseArray}. 
 	final File _diskCacheLocation;
@@ -47,7 +49,7 @@ final public class UrlImageLoaderConfiguration {
 		_imageViewUpdateHandler = builder._imageViewUpdateHandler;
 		_imageWriter = builder._imageWriter;
 		_diskCache = builder._diskCache;
-		_imageReadWriteLock = builder._imageReadWriteLock;
+		_futureBitmapCache = builder._futureBitmapCache;
 		_taskListener = builder._taskListener;
 		_diskCacheLocation = builder._diskCacheLocation;
 		_imageQuality = builder._imageQuality;
@@ -69,7 +71,7 @@ final public class UrlImageLoaderConfiguration {
 		private String _directoryName;
 		private File _diskCacheLocation;
 		private MemoryCache<ImageKey, File> _diskCache;
-		private ReadWriteImageLock<ImageKey> _imageReadWriteLock;
+		private MemoryCache<ImageKey, FutureTask<Bitmap>> _futureBitmapCache;
 		private ImageTaskListener _taskListener;
 		private int _imageQuality;
 		private Config _configType;
@@ -161,8 +163,8 @@ final public class UrlImageLoaderConfiguration {
 				_maxCacheMemorySizeInMB = 1;
 			}
 			
-			if(_imageReadWriteLock == null)
-				_imageReadWriteLock = new ImageLock();
+			if(_futureBitmapCache == null)
+				_futureBitmapCache = new BitmapMemorizer();
 				
 			if(_memoryCache ==null)
 				_memoryCache = new LRUCache(_maxCacheMemorySizeInMB);

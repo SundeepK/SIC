@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;

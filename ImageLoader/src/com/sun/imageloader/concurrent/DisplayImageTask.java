@@ -1,7 +1,9 @@
-package com.sun.imageloader.core;
+package com.sun.imageloader.concurrent;
 
 import java.util.Map;
 
+import com.sun.imageloader.core.ImageKey;
+import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.core.api.ImageTaskListener;
 
 import android.graphics.Bitmap;
