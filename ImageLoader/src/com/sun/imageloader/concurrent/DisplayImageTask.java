@@ -1,21 +1,16 @@
 package com.sun.imageloader.concurrent;
 
-import java.util.Map;
-
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.core.api.ImageTaskListener;
-
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 public class DisplayImageTask implements Runnable {
 
-	ImageSettings _imageSettings;
-	Bitmap _bitmap;
-	Map<Integer, ImageKey> _imageViewMap;
-	ImageTaskListener _taskListener;
-	
+	private final ImageSettings _imageSettings;
+	private final Bitmap _bitmap;
+	private ImageTaskListener _taskListener;
 	/**
 	 * {@linkplain DisplayImageTask} is used to display the {@linkplain Bitmap} into the {@linkplain ImageView}.
 	 * 
@@ -27,26 +22,17 @@ public class DisplayImageTask implements Runnable {
 	 * 			the map which associates {@linkplain ImageView} objects with the {@link ImageKey} 
 	 * 			
 	 */
-	public DisplayImageTask (ImageSettings imageSettings_, Bitmap bitmap_, Map<Integer, ImageKey> imageViewMap_, ImageTaskListener taskListener_){
+	public DisplayImageTask (ImageSettings imageSettings_, Bitmap bitmap_, ImageTaskListener taskListener_){
 		_imageSettings = imageSettings_;
 		_bitmap = bitmap_;
-		_imageViewMap = imageViewMap_;
 		_taskListener = taskListener_;
 	}
 	
 	@Override
 	public void run() {
 		_taskListener.preImageLoad(_imageSettings);
-		
-		if(_imageSettings == null){
-			
-	    }else if(_imageSettings.getImageKey() == _imageViewMap.get(_imageSettings.getImageView().hashCode())){
-			_imageSettings.getImageView().setImageBitmap(_bitmap);
-			_imageViewMap.remove(_imageSettings.getImageView().hashCode());
-		}
+		_imageSettings.getImageView().setImageBitmap(_bitmap);
 		_taskListener.onImageLoadComplete(_bitmap, _imageSettings);
-		
-		
 	}
 
 }

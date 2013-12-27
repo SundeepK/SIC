@@ -7,12 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import android.app.PendingIntent.CanceledException;
-import android.graphics.Bitmap;
-
 import com.sun.imageloader.cache.impl.IMemorizer;
 import com.sun.imageloader.concurrent.ComputableCallable;
-import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.imagedecoder.utils.L;
 

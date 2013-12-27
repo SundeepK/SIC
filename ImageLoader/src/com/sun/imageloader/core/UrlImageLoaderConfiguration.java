@@ -1,28 +1,30 @@
 package com.sun.imageloader.core;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
+
 import com.sun.imageloader.cache.api.MemoryCache;
-import com.sun.imageloader.cache.api.ReadWriteImageLock;
 import com.sun.imageloader.cache.impl.BitmapMemorizer;
 import com.sun.imageloader.cache.impl.DiskCache;
-import com.sun.imageloader.cache.impl.ImageLock;
+import com.sun.imageloader.cache.impl.IMemorizer;
 import com.sun.imageloader.cache.impl.LRUCache;
+import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.core.api.ImageTaskListener;
+import com.sun.imageloader.imagedecoder.api.ImageDecoder;
+import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
 
 
@@ -32,33 +34,32 @@ final public class UrlImageLoaderConfiguration {
 
 	final MemoryCache<ImageKey, Bitmap> _lruMemoryCache;
 	final Handler _imageViewUpdateHandler;
-	final ImageWriter _imageWriter;
 	final MemoryCache<ImageKey, File> _diskCache;
-	final MemoryCache<ImageKey, FutureTask<Bitmap>> _futureBitmapCache;
+	final IMemorizer<ImageSettings, Bitmap> _bitmapMemorizer;
 	final ImageTaskListener _taskListener;
-	final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; // Associate {@link ImageView} and image being loaded using a unique key in an internal {@link SparseArray}. 
 	final File _diskCacheLocation;
 	final int _imageQuality;
 	final Config _configType;
 	final CompressFormat _compressFormat;
 	final ThreadPoolExecutor _threadPoolForTaskExecutor;
 	final Drawable _onLoadingDrawable;
-	
+	final Computable<ImageSettings, Bitmap> _computable;
+
+
 	private UrlImageLoaderConfiguration (Builder builder){
 		_lruMemoryCache = builder._memoryCache;
 		_imageViewUpdateHandler = builder._imageViewUpdateHandler;
-		_imageWriter = builder._imageWriter;
 		_diskCache = builder._diskCache;
-		_futureBitmapCache = builder._futureBitmapCache;
+		
 		_taskListener = builder._taskListener;
 		_diskCacheLocation = builder._diskCacheLocation;
 		_imageQuality = builder._imageQuality;
 		_configType = builder._configType;
 		_compressFormat = builder._compressFormat;
 		_threadPoolForTaskExecutor = builder._threadPoolForTaskExecutor;
-		_viewKeyMap = new ConcurrentHashMap<Integer, ImageKey>();
 		_onLoadingDrawable = builder._onLoadingDrawable;
-		
+		_computable = builder._computable;
+		_bitmapMemorizer = builder._bimapMemorizer;
 	}
 	
 	public static class Builder {
@@ -71,13 +72,15 @@ final public class UrlImageLoaderConfiguration {
 		private String _directoryName;
 		private File _diskCacheLocation;
 		private MemoryCache<ImageKey, File> _diskCache;
-		private MemoryCache<ImageKey, FutureTask<Bitmap>> _futureBitmapCache;
+		private IMemorizer<ImageSettings, Bitmap> _bimapMemorizer;
 		private ImageTaskListener _taskListener;
 		private int _imageQuality;
 		private Config _configType;
 		private	CompressFormat _compressFormat;
 		private ThreadPoolExecutor _threadPoolForTaskExecutor;
 		private Drawable _onLoadingDrawable;
+		private Computable<ImageSettings, Bitmap> _computable;
+		private ImageDecoder _imageDecoder;
 
 		/**
 		 * Builder to construct the {@link UrlImageLoaderConfiguration} used by {@link UrlImageLoader} to retrieve images.
@@ -162,10 +165,7 @@ final public class UrlImageLoaderConfiguration {
 			if(_maxCacheMemorySizeInMB <= 0){
 				_maxCacheMemorySizeInMB = 1;
 			}
-			
-			if(_futureBitmapCache == null)
-				_futureBitmapCache = new BitmapMemorizer();
-				
+							
 			if(_memoryCache ==null)
 				_memoryCache = new LRUCache(_maxCacheMemorySizeInMB);
 			
@@ -211,6 +211,16 @@ final public class UrlImageLoaderConfiguration {
 			if(_onLoadingDrawable == null){
 				_onLoadingDrawable = new ColorDrawable(Color.BLACK);
 			}
+			
+			if(_imageDecoder == null)
+				_imageDecoder = new SimpleImageDecoder();
+			
+		
+			if(_computable == null)
+				_computable = new ComputableImage(_imageDecoder, _memoryCache,_diskCache, _imageWriter, _taskListener);	
+
+			if(_bimapMemorizer == null)
+				_bimapMemorizer = new BitmapMemorizer(_computable);
 				
 		}
 		
@@ -247,6 +257,7 @@ final public class UrlImageLoaderConfiguration {
 			}
 			return diskCacheLocation;
 		}
+
 	}
 
 }

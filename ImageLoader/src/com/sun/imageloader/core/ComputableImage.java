@@ -4,36 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.concurrent.locks.Lock;
-
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.widget.ImageView;
-
 import com.sun.imageloader.cache.api.MemoryCache;
-import com.sun.imageloader.cache.api.ReadWriteImageLock;
-import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.core.api.FailedTaskReason;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.core.api.FailedTaskReason.ExceptionType;
 import com.sun.imageloader.downloader.api.ImageRetriever;
+import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
 
-public class ComputableImage implements Computable<ImageKey, Bitmap> {
+public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 	
 	private static final String TAG = ComputableImage.class.getName();
 	private static final String THREAD_NAME = Thread.currentThread().getName();
-	protected final ImageSettings _imageSettings;
 	protected final ImageDecoder _imageDecoder;
 	protected final MemoryCache<ImageKey, Bitmap> _lruCache;
 	protected final MemoryCache<ImageKey, File> _diskCache;
 	protected final ImageWriter _imageWriter;
-	protected final ImageRetriever _imageDownloader;
-	protected final ReadWriteImageLock<ImageKey> _readWriteLock;
-	protected final UrlImageLoaderConfiguration _configs;
+	private ImageTaskListener _taskListener;
 	
 	/**
 	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from either the internal cache, disk or from a network call.
@@ -43,62 +35,54 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 	 * 			used to decode the image to a {@link Bitmap}
 	 * @param imageSettings_
 	 * 			contains the various objects associated with the {@link Bitmap} that will be loaded onto an {@link ImageView}
-	 * @param imageDownloader_
+	 * @param imageRetriever_
 	 * 			used to obtain an {@link InputStream} containing the bytes to decode into a {@link Bitmap}
 	 * @param configs_
 	 * 			config which contains references to various internal caches and data structures
 	 * @param taskListener_
 	 * 			listener needed to perform special operations at certain events
 	 */
-	public ComputableImage(ImageDecoder imageDecoder_,ImageSettings imageSettings_,	ImageRetriever imageDownloader_,
-			UrlImageLoaderConfiguration configs_, ImageTaskListener taskListener_) {
+	public ComputableImage(ImageDecoder imageDecoder_,
+			MemoryCache<ImageKey, Bitmap> lruCache_, MemoryCache<ImageKey, File> diskCache_, 
+			ImageWriter imageWriter_, ImageTaskListener taskListener_) {
 		_imageDecoder = imageDecoder_;
-		_lruCache = configs_._lruMemoryCache;
-		_imageWriter = configs_._imageWriter;
-		_diskCache = configs_._diskCache;
-		_imageDownloader = imageDownloader_;
+		_lruCache = lruCache_;
+		_imageWriter = imageWriter_;
+		_diskCache = diskCache_;
 		_taskListener = taskListener_;
-		_configs= configs_;
 	}
 
 
 	@Override
-	public Bitmap compute(ImageKey valueToCompute) {
+	public Bitmap compute(ImageSettings valueToCompute_) {
 		Bitmap decodedImage = null;
 
-		decodedImage = _lruCache.getValue(_imageSettings.getImageKey());
+		decodedImage = _lruCache.getValue(valueToCompute_.getImageKey());
 
 		if (decodedImage == null) {
-			decodedImage = loadBitmap();
+			decodedImage = loadBitmap(valueToCompute_);
 		}
 
 		if (decodedImage != null) {
-			_lruCache.put(_imageSettings.getImageKey(), decodedImage);
-			postDisplayImage(decodedImage);
-		}else{
-			_configs._viewKeyMap.remove(_imageSettings.getImageView().hashCode());
+			_lruCache.put(valueToCompute_.getImageKey(), decodedImage);
 		}
-		return null;
+		
+		return decodedImage;
 	}
 
 	/**
 	 * Load the {@link Bitmap} object from either the cache, disk or network call
 	 * @return
 	 */
-	private Bitmap loadBitmap() {
+	private Bitmap loadBitmap(ImageSettings imageSettings_) {
 
 		Bitmap imageToRetreive = null;
-		Lock lock = _readWriteLock.getReadWriteLock(_imageSettings.getImageKey());
 		try {
-			lock.lock();
-			ImageKey imageKey = _imageSettings.getImageKey();
-			if(imageKey != _configs._viewKeyMap.get(_imageSettings.getImageView().hashCode())){
-				return null;
-			}
-			imageToRetreive = tryLoadImageFromDisk();
+
+			imageToRetreive = tryLoadImageFromDisk(imageSettings_);
 
 			if (imageToRetreive == null) {
-				imageToRetreive = tryLoadImageFromNetwork();
+				imageToRetreive = tryLoadImageFromNetwork(imageSettings_);
 
 				if (imageToRetreive != null)
 					L.v(TAG, THREAD_NAME + ": Loaded image from network successfully");
@@ -108,19 +92,17 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 			}
 
 		} catch (IOException e) {
-			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.IOException, e), _imageSettings);
+			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.IOException, e), imageSettings_);
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.URISyntaxException, e), _imageSettings);
+			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.URISyntaxException, e), imageSettings_);
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.URISyntaxException, e), _imageSettings);
+			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.URISyntaxException, e), imageSettings_);
 			e.printStackTrace();
 		} catch (OutOfMemoryError e) {
-			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.OutOfMemoryError, e), _imageSettings);
+			_taskListener.onImageLoadFail(new FailedTaskReason(ExceptionType.OutOfMemoryError, e), imageSettings_);
 			e.printStackTrace();
-		}finally{
-			lock.unlock();
 		}
 
 		return imageToRetreive;
@@ -134,20 +116,15 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	private Bitmap tryLoadImageFromNetwork() throws IOException,
+	private Bitmap tryLoadImageFromNetwork(ImageSettings imageSettings_) throws IOException,
 			URISyntaxException {
-		if(_imageSettings.getImageKey() != _configs._viewKeyMap.get(_imageSettings.getImageView().hashCode())){
-			return null;
-		}
-		
 		Bitmap imageLoadedFromNetwork = null;
-			
-			InputStream stream = _imageDownloader.getStream(_imageSettings
+		ImageRetriever imageRetriever = ImageRetrieverFactory.getImageRetriever(imageSettings_.getUrl());
+		InputStream stream = imageRetriever.getStream(imageSettings_
 					.getUrl());
-			
-			imageLoadedFromNetwork = _imageDecoder.decodeImage(stream, _imageSettings, true);
-			_imageWriter.writeBitmapToDisk(_imageSettings,
-					imageLoadedFromNetwork);
+		
+		imageLoadedFromNetwork = _imageDecoder.decodeImage(stream, imageSettings_, true);
+		_imageWriter.writeBitmapToDisk(imageSettings_,imageLoadedFromNetwork);
 
 		return imageLoadedFromNetwork;
 	}
@@ -160,13 +137,9 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
 	 */
-	private Bitmap tryLoadImageFromDisk() throws IOException,
+	private Bitmap tryLoadImageFromDisk(ImageSettings imageSettings_) throws IOException,
 			URISyntaxException, InterruptedException {
-		ImageKey imageKey = _imageSettings.getImageKey();
-
-		if(imageKey != _configs._viewKeyMap.get(_imageSettings.getImageView().hashCode())){
-			return null;
-		}
+		ImageKey imageKey = imageSettings_.getImageKey();
 
 		Bitmap cachedImage = _lruCache.getValue(imageKey);
 
@@ -177,7 +150,7 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 		File imageFile = _diskCache.getValue(imageKey);
 		
 		if(imageFile == null){
-			imageFile = new File(_configs._diskCacheLocation, _imageSettings.getFinalFileName());
+			imageFile = new File(_imageWriter.getFileSaveDirectoryPath(), imageSettings_.getFinalFileName());
 		}
 
 		if (imageFile != null) {
@@ -189,7 +162,7 @@ public class ComputableImage implements Computable<ImageKey, Bitmap> {
 				L.v(TAG, THREAD_NAME +
 						"File exists and so decoding from the image from the disk: "
 								+ imageFile.getAbsolutePath());
-				Bitmap decodeImage = _imageDecoder.decodeImage(imageFile, _imageSettings, false);
+				Bitmap decodeImage = _imageDecoder.decodeImage(imageFile, imageSettings_, false);
 				return decodeImage;
 			}
 

@@ -13,7 +13,6 @@ import com.sun.imageloader.imagedecoder.utils.L;
 public class ImageWriter {
 	private static final String TAG = ImageWriter.class.getName();
 	private static final String THREAD_NAME = Thread.currentThread().getName();
-
 	private File _fileSaveDirectory;
 
 	/**
@@ -86,5 +85,13 @@ public class ImageWriter {
 				closeable_ = null;
 			}
 		}
+	}
+	
+	public File getFileSaveDirectory(){
+		return new File(_fileSaveDirectory.getAbsolutePath());
+	}
+	
+	public String getFileSaveDirectoryPath(){
+		return _fileSaveDirectory.getAbsolutePath();
 	}
 }

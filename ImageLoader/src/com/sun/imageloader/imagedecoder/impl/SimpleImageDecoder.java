@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.sun.imageloader.core.ImageSettings;
@@ -20,9 +19,7 @@ import com.sun.imageloader.imagedecoder.utils.L;
 
 public class SimpleImageDecoder implements ImageDecoder {
 	private static final String TAG = SimpleImageDecoder.class.getName();
-	private Rect _srcRect = new Rect();
-	private Rect _destRect = new Rect();
-	
+
 	public SimpleImageDecoder() {
 
 	}

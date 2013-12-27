@@ -4,8 +4,6 @@ import java.util.concurrent.Callable;
 
 import com.sun.imageloader.core.api.Computable;
 
-import android.graphics.Bitmap;
-
 public class ComputableCallable<T,V> implements Callable<V> {
 
 	private Computable<T, V> _computable;

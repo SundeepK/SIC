@@ -2,16 +2,13 @@ package com.sun.imageloader.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
 
 import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
-import com.sun.imageloader.downloader.api.ImageRetriever;
-import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
-import com.sun.imageloader.imagedecoder.api.ImageDecoder;
-import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.KeyUtils;
 import com.sun.imageloader.imagedecoder.utils.L;
 
@@ -127,34 +124,36 @@ public class UrlImageLoader {
 			listener_ = _ImageLoaderConfig._taskListener;
 		}
 			
-		URI imageUri = new URI(uri_);
+		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
 
-		int key = KeyUtils.getPathKey(imageUri);
-		ImageKey imageKey = new ImageKey(key, sampleSize_);
+		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
 
-		_ImageLoaderConfig._viewKeyMap.put(imageView_.hashCode(), imageKey);
-		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageKey);
-		ImageSettings imageSpecificSettings = new ImageSettings(imageUri, imageView_, imageKey, _ImageLoaderConfig._compressFormat,
-				_ImageLoaderConfig._configType, _ImageLoaderConfig._imageQuality);
 
 		if (bmp != null && !bmp.isRecycled()) {
 			L.v( TAG,  "Loaded bitmap image from cache, using url: " + uri_);
 			
-			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, _ImageLoaderConfig._viewKeyMap, listener_);
+			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_);
 			_ImageLoaderConfig._imageViewUpdateHandler.post(displayTask);
 					
 		}else{
 			
 			L.v( TAG,  "No image found in cache, attempting to fetch image via network or disk: " + uri_);
 			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
-			ImageRetriever imageDownloader = ImageRetrieverFactory.getImageRetriever(imageUri);
-			ImageDecoder decoder = new SimpleImageDecoder();
-			ImageLoaderTask	displayTask = new ImageLoaderTask(decoder, imageSpecificSettings,  imageDownloader,
-					_ImageLoaderConfig, listener_);
+			ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
+					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, listener_);
 			_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
 			
 		}
 	
+	}
+	
+	private ImageSettings getImageSettings(String uri_, int sampleSize_, ImageView imageView_) throws URISyntaxException{
+		URI imageUri = new URI(uri_);
+		int key = KeyUtils.getPathKey(imageUri);
+		ImageKey imageKey = new ImageKey(key, sampleSize_);
+		ImageSettings imageSpecificSettings = new ImageSettings(imageUri, imageView_, imageKey, _ImageLoaderConfig._compressFormat,
+				_ImageLoaderConfig._configType, _ImageLoaderConfig._imageQuality);
+		return imageSpecificSettings;
 	}
 
 	private void checkConfiguration() {
