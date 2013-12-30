@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.concurrent.ConcurrentHashMap;
+
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 import com.sun.imageloader.cache.api.MemoryCache;
-import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.core.api.FailedTaskReason;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.core.api.FailedTaskReason.ExceptionType;
@@ -15,17 +16,21 @@ import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.memorizer.api.Computable;
+import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
 
 public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 	
 	private static final String TAG = ComputableImage.class.getName();
 	private static final String THREAD_NAME = Thread.currentThread().getName();
-	protected final ImageDecoder _imageDecoder;
-	protected final MemoryCache<ImageKey, Bitmap> _lruCache;
-	protected final MemoryCache<ImageKey, File> _diskCache;
-	protected final ImageWriter _imageWriter;
+	private final ImageDecoder _imageDecoder;
+	private final MemoryCache<ImageKey, Bitmap> _lruCache;
+	private final MemoryCache<ImageKey, File> _diskCache;
+	private final ImageWriter _imageWriter;
 	private ImageTaskListener _taskListener;
+    final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; 
+
 	
 	/**
 	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from either the internal cache, disk or from a network call.
@@ -44,17 +49,22 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	 */
 	public ComputableImage(ImageDecoder imageDecoder_,
 			MemoryCache<ImageKey, Bitmap> lruCache_, MemoryCache<ImageKey, File> diskCache_, 
-			ImageWriter imageWriter_, ImageTaskListener taskListener_) {
+			ImageWriter imageWriter_, ImageTaskListener taskListener_, 	ConcurrentHashMap<Integer, ImageKey> viewKeyMap_ ) {
 		_imageDecoder = imageDecoder_;
 		_lruCache = lruCache_;
 		_imageWriter = imageWriter_;
 		_diskCache = diskCache_;
 		_taskListener = taskListener_;
+		_viewKeyMap = viewKeyMap_;
 	}
 
 
 	@Override
-	public Bitmap compute(ImageSettings valueToCompute_) {
+	public Bitmap compute(ImageSettings valueToCompute_) throws InterruptedImageLoadException {
+		
+		_viewKeyMap.put(valueToCompute_.getImageView().hashCode(), valueToCompute_.getImageKey());
+		valueToCompute_.getImageView().setTag(valueToCompute_.getImageKey());
+		
 		Bitmap decodedImage = null;
 
 		decodedImage = _lruCache.getValue(valueToCompute_.getImageKey());
@@ -67,14 +77,18 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 			_lruCache.put(valueToCompute_.getImageKey(), decodedImage);
 		}
 		
+		if(!isViewStillValid(valueToCompute_))
+			throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
+		
 		return decodedImage;
 	}
 
 	/**
 	 * Load the {@link Bitmap} object from either the cache, disk or network call
 	 * @return
+	 * @throws InterruptedImageLoadException 
 	 */
-	private Bitmap loadBitmap(ImageSettings imageSettings_) {
+	private Bitmap loadBitmap(ImageSettings imageSettings_) throws InterruptedImageLoadException {
 
 		Bitmap imageToRetreive = null;
 		try {
@@ -115,9 +129,14 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	 * 		{@link Bitmap} of the final decoded image
 	 * @throws IOException
 	 * @throws URISyntaxException
+	 * @throws InterruptedImageLoadException 
 	 */
 	private Bitmap tryLoadImageFromNetwork(ImageSettings imageSettings_) throws IOException,
-			URISyntaxException {
+			URISyntaxException, InterruptedImageLoadException {
+		
+		if(!isViewStillValid(imageSettings_))
+			throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
+		
 		Bitmap imageLoadedFromNetwork = null;
 		ImageRetriever imageRetriever = ImageRetrieverFactory.getImageRetriever(imageSettings_.getUrl());
 		InputStream stream = imageRetriever.getStream(imageSettings_
@@ -126,6 +145,9 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 		imageLoadedFromNetwork = _imageDecoder.decodeImage(stream, imageSettings_, true);
 		_imageWriter.writeBitmapToDisk(imageSettings_,imageLoadedFromNetwork);
 
+		if(!isViewStillValid(imageSettings_))
+			throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
+		
 		return imageLoadedFromNetwork;
 	}
 
@@ -136,9 +158,14 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 * @throws InterruptedException
+	 * @throws InterruptedImageLoadException 
 	 */
 	private Bitmap tryLoadImageFromDisk(ImageSettings imageSettings_) throws IOException,
-			URISyntaxException, InterruptedException {
+			URISyntaxException, InterruptedException, InterruptedImageLoadException {
+		
+		if(!isViewStillValid(imageSettings_))
+			throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
+		
 		ImageKey imageKey = imageSettings_.getImageKey();
 
 		Bitmap cachedImage = _lruCache.getValue(imageKey);
@@ -146,6 +173,7 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 		if (cachedImage != null) {
 			return cachedImage;
 		}
+		
 		
 		File imageFile = _diskCache.getValue(imageKey);
 		
@@ -167,11 +195,26 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 			}
 
 		}
+		
+		if(!isViewStillValid(imageSettings_))
+			throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
+		
 		return null;
 
 	}
 
-
+	private boolean isViewStillValid(ImageSettings imageSettings_) {
+		int viewKey = imageSettings_.getImageView().hashCode();
+		ImageKey key = _viewKeyMap.get(viewKey);
+		if (key.equals(imageSettings_.getImageKey()) && (imageSettings_.getImageView().getTag().equals(key))) {
+			L.v(TAG, "View is still valid");
+			return true;
+		}
+		
+		L.v(TAG, "View is invalid now");
+		_viewKeyMap.remove(viewKey);
+		return false;
+	}
 
 
 }

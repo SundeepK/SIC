@@ -1,4 +1,4 @@
-package com.sun.imageloader.cache.impl;
+package com.sun.imageloader.memorizer.api;
 
 import java.util.concurrent.ExecutionException;
 
@@ -12,6 +12,6 @@ public interface IMemorizer<T, V> {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
-	public V executeComputable(T computable_) throws InterruptedException, ExecutionException;
+	public V executeComputable(T computable_) throws InterruptedImageLoadException, ExecutionException;
 
 }

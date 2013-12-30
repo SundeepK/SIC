@@ -1,4 +1,4 @@
-package com.sun.imageloader.cache.api;
+package com.sun.imageloader.memorizer.api;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -7,9 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import com.sun.imageloader.cache.impl.IMemorizer;
 import com.sun.imageloader.concurrent.ComputableCallable;
-import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.imagedecoder.utils.L;
 
 public abstract class AMemorizer<T,V> implements IMemorizer<T,V> {
@@ -30,7 +28,7 @@ public abstract class AMemorizer<T,V> implements IMemorizer<T,V> {
 	protected abstract Callable<V> getCallable(T computable_);
 	
 	@Override
-	public V executeComputable(T computableKey_) throws InterruptedException, ExecutionException {
+	public V executeComputable(T computableKey_) throws InterruptedImageLoadException, ExecutionException {
 		
 		Future<V> future = _bitmapFutureCache.get(computableKey_);
 		V returnValue = null;
@@ -50,8 +48,12 @@ public abstract class AMemorizer<T,V> implements IMemorizer<T,V> {
 		}catch (CancellationException e) {
 			L.v(TAG, "Future task was cancelled, so removing task from cache with key: " + computableKey_);
 			_bitmapFutureCache.remove(computableKey_);
+		}catch (InterruptedException e){
+			_bitmapFutureCache.remove(computableKey_);
+			throw new InterruptedImageLoadException("Image load was interrupted", e);
 		}
 		
+		_bitmapFutureCache.remove(computableKey_);
 		return returnValue;
 	}
 	

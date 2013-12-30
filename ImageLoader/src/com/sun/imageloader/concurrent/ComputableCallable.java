@@ -2,7 +2,7 @@ package com.sun.imageloader.concurrent;
 
 import java.util.concurrent.Callable;
 
-import com.sun.imageloader.core.api.Computable;
+import com.sun.imageloader.memorizer.api.Computable;
 
 public class ComputableCallable<T,V> implements Callable<V> {
 

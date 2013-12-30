@@ -1,23 +1,23 @@
 package com.sun.imageloader.core;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.net.URI;
-
-import com.sun.imageloader.core.api.Settings;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.widget.ImageView;
 
+import com.sun.imageloader.core.api.Settings;
+
 public class ImageSettings  extends Settings{
 
-	private final  ImageView _imageView;
-
+	private final ImageView _imageView;
+//	private final Reference<ImageView>_imageView;
 	private final int _width;
 	private final int _height;
 	private final boolean  _shouldUseSampleSizeFromImageKey;
-	
-
 
 	/**
 	 * Used to keep references to the {@link URI} and {@link ImageView} that will be used to display and retrieve {@link Bitmap} for
@@ -71,7 +71,7 @@ public class ImageSettings  extends Settings{
 	}
 	
 	public ImageView getImageView() {
-		return _imageView;
+		return  _imageView;
 	}
 
 	public int getDestWidth() {

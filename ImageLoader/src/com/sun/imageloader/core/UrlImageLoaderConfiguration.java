@@ -1,6 +1,7 @@
 package com.sun.imageloader.core;
 
 import java.io.File;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,15 +18,15 @@ import android.os.Handler;
 import android.text.TextUtils;
 
 import com.sun.imageloader.cache.api.MemoryCache;
-import com.sun.imageloader.cache.impl.BitmapMemorizer;
 import com.sun.imageloader.cache.impl.DiskCache;
-import com.sun.imageloader.cache.impl.IMemorizer;
 import com.sun.imageloader.cache.impl.LRUCache;
-import com.sun.imageloader.core.api.Computable;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.memorizer.api.BitmapMemorizer;
+import com.sun.imageloader.memorizer.api.Computable;
+import com.sun.imageloader.memorizer.api.IMemorizer;
 
 
 final public class UrlImageLoaderConfiguration {
@@ -36,6 +37,7 @@ final public class UrlImageLoaderConfiguration {
 	final Handler _imageViewUpdateHandler;
 	final MemoryCache<ImageKey, File> _diskCache;
 	final IMemorizer<ImageSettings, Bitmap> _bitmapMemorizer;
+    final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; // Associate {@link ImageView} and image being loaded using a unique key in an internal {@link SparseArray}. 
 	final ImageTaskListener _taskListener;
 	final File _diskCacheLocation;
 	final int _imageQuality;
@@ -50,7 +52,7 @@ final public class UrlImageLoaderConfiguration {
 		_lruMemoryCache = builder._memoryCache;
 		_imageViewUpdateHandler = builder._imageViewUpdateHandler;
 		_diskCache = builder._diskCache;
-		
+		_viewKeyMap = builder._viewKeyMap;
 		_taskListener = builder._taskListener;
 		_diskCacheLocation = builder._diskCacheLocation;
 		_imageQuality = builder._imageQuality;
@@ -64,6 +66,7 @@ final public class UrlImageLoaderConfiguration {
 	
 	public static class Builder {
 		
+		private ConcurrentHashMap<Integer, ImageKey> _viewKeyMap;
 		private int _maxCacheMemorySizeInMB;
 		private MemoryCache<ImageKey, Bitmap> _memoryCache;
 		private Handler _imageViewUpdateHandler;
@@ -162,6 +165,9 @@ final public class UrlImageLoaderConfiguration {
 		 * 
 		 */
 		private void initBuilder(Context context_){
+			
+			_viewKeyMap = new ConcurrentHashMap<Integer, ImageKey>();
+			
 			if(_maxCacheMemorySizeInMB <= 0){
 				_maxCacheMemorySizeInMB = 1;
 			}
@@ -217,10 +223,13 @@ final public class UrlImageLoaderConfiguration {
 			
 		
 			if(_computable == null)
-				_computable = new ComputableImage(_imageDecoder, _memoryCache,_diskCache, _imageWriter, _taskListener);	
+				_computable = new ComputableImage(_imageDecoder, _memoryCache,
+						_diskCache, _imageWriter, _taskListener,_viewKeyMap);	
 
 			if(_bimapMemorizer == null)
 				_bimapMemorizer = new BitmapMemorizer(_computable);
+			
+		
 				
 		}
 		

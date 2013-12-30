@@ -5,10 +5,11 @@ import java.util.concurrent.ExecutionException;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.widget.ImageView;
-import com.sun.imageloader.cache.impl.IMemorizer;
 import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.memorizer.api.IMemorizer;
+import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
 
 public class ImageLoaderTask implements Runnable {
 	private static final String TAG = ImageLoaderTask.class.getName();
@@ -62,8 +63,9 @@ public class ImageLoaderTask implements Runnable {
 		Bitmap loadedBitmap = null;
 		try {
 			loadedBitmap = _bitmapMemoizer.executeComputable(_imageSettings);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (InterruptedImageLoadException e) {
+			L.w(TAG, "Image load was cancelled, so returing null Bitmap");
+			return null;
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
