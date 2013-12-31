@@ -29,8 +29,6 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	private final MemoryCache<ImageKey, File> _diskCache;
 	private final ImageWriter _imageWriter;
 	private ImageTaskListener _taskListener;
-    final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; 
-
 	
 	/**
 	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from either the internal cache, disk or from a network call.
@@ -55,7 +53,6 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 		_imageWriter = imageWriter_;
 		_diskCache = diskCache_;
 		_taskListener = taskListener_;
-		_viewKeyMap = viewKeyMap_;
 	}
 
 
@@ -75,8 +72,6 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 		if (decodedImage != null) {
 			_lruCache.put(valueToCompute_.getImageKey(), decodedImage);
-		}else{
-			_viewKeyMap.remove(valueToCompute_.getImageView().hashCode());
 		}
 			
 		return decodedImage;
@@ -202,12 +197,10 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	}
 
 	private boolean isViewStillValid(ImageSettings imageSettings_) {
-		int viewKey = imageSettings_.getImageView().hashCode();
 			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{
-				_viewKeyMap.remove(viewKey);
 				L.v(TAG, "View is invalid now");
 				return false;
 			}

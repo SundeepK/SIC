@@ -2,14 +2,11 @@ package com.sun.imageloader.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.AbsListView.OnScrollListener;
-
 import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.utils.KeyUtils;
@@ -24,16 +21,6 @@ public class UrlImageLoader implements OnScrollListener {
 	private static final String ERROR_WRONG_ARGUMENTS = "Wrong arguments supplied";
 	private UrlImageLoaderConfiguration _ImageLoaderConfig;
 	private UrlImageTaskExecutor _urlImageLoaderTaskExecutor;
-//	private int SCROLL_STATE_IDLE;
-//	private int	SCROLL_STATE_TOUCH_SCROLL;
-//	private int SCROLL_STATE_FLING;
-	private int scroll_state;
-	
-	
-	private boolean SCROLL_STATE_IDLE;
-	private boolean	SCROLL_STATE_TOUCH_SCROLL;
-	private boolean SCROLL_STATE_FLING;
-	
 	private volatile static UrlImageLoader urlImageLoaderInstance;
 
 	/** Returns singleton class instance */
@@ -125,7 +112,6 @@ public class UrlImageLoader implements OnScrollListener {
 			int sampleSize_, ImageTaskListener listener_) throws URISyntaxException {
 		checkConfiguration();
 
-		
 		if (imageView_ == null) {
 			throw new IllegalArgumentException(ERROR_WRONG_ARGUMENTS);
 		}
@@ -134,16 +120,14 @@ public class UrlImageLoader implements OnScrollListener {
 		}
 			
 		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
-
 		
 		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
 		imageView_.setTag(imageSpecificSettings.getImageKey());
 
-		_ImageLoaderConfig._viewKeyMap.put(imageView_.hashCode(), imageSpecificSettings.getImageKey());
 		if (bmp != null && !bmp.isRecycled()) {
 			L.v( TAG,  "Loaded bitmap image from cache, using url: " + uri_);
 			
-			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_, _ImageLoaderConfig._viewKeyMap);
+			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_);
 			_ImageLoaderConfig._imageViewUpdateHandler.post(displayTask);
 					
 		}else{
@@ -151,19 +135,14 @@ public class UrlImageLoader implements OnScrollListener {
 			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
 			ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
 					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, 
-					listener_, _ImageLoaderConfig._viewKeyMap, _ImageLoaderConfig._flingLock);
+					listener_, _ImageLoaderConfig._flingLock);
 			_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
 			
 		}
 	
 	}
 	
-	
-//	private boolean checkListViewState(){
-//		if(SCROLL_STATE_IDLE)
-//
-//	}
-	
+
 	private ImageSettings getImageSettings(String uri_, int sampleSize_, ImageView imageView_) throws URISyntaxException{
 		URI imageUri = new URI(uri_);
 		int key = KeyUtils.getPathKey(imageUri);
@@ -186,26 +165,18 @@ public class UrlImageLoader implements OnScrollListener {
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		scroll_state = scrollState;
-
 		switch (scrollState) {
 		case OnScrollListener.SCROLL_STATE_IDLE:
 			_ImageLoaderConfig._flingLock.resume();
 			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_IDLE);
-
-			SCROLL_STATE_IDLE = true;
 			break;
 		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
 			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
 			_ImageLoaderConfig._flingLock.resume();
-
-			SCROLL_STATE_IDLE = true;
 			break;
 		case OnScrollListener.SCROLL_STATE_FLING:
 			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_FLING);
 			_ImageLoaderConfig._flingLock.pause();
-
-			SCROLL_STATE_IDLE = false;
 			break;
 		}
 	}

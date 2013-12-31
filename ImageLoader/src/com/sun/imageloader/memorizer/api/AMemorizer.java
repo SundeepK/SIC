@@ -10,14 +10,12 @@ import java.util.concurrent.FutureTask;
 import com.sun.imageloader.concurrent.ComputableCallable;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;
-import com.sun.imageloader.core.api.Settings;
 import com.sun.imageloader.imagedecoder.utils.L;
 
 public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorizer<T,V> {
 	private static final String TAG = AMemorizer.class.getName();
 	private ConcurrentHashMap<? super ImageKey, Future<V>> _bitmapFutureCache;
 	private Computable<T, V> _computable;
-	private final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap;
 
 	/**
 	 * AMemorizer is used to encapsulates a Computable so that Future tasks can be cached and computed when nessicary.
@@ -27,38 +25,17 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 	protected AMemorizer(Computable<T, V> computable_,  ConcurrentHashMap<Integer, ImageKey> viewKeyMap_){
 		_computable =  computable_;
 		_bitmapFutureCache  = new ConcurrentHashMap<ImageKey, Future<V>>();
-		_viewKeyMap = viewKeyMap_;
 	}
 	
 	protected abstract Callable<V> getCallable(T computable_);
 	
-	private boolean isViewStillValid(ImageSettings imageSettings_) {
-		int viewKey = imageSettings_.getImageView().hashCode();
-			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
-				L.v(TAG, "View is still valid");
-				return true;
-			}else{
-				_viewKeyMap.remove(viewKey);
-				L.v(TAG, "View is invalid now");
-				return false;
-			}
-	}
-	
 	@Override
 	public V executeComputable(T computableKey_) throws InterruptedImageLoadException, ExecutionException {
 
-		
 		ImageKey key = computableKey_.getImageKey();
 		Future<V> future = _bitmapFutureCache.get(key);
 		V returnValue = null;
-		
-//		
-//		if(!isViewValid(computableKey_)){
-//			if(future != null){
-//				future.cancel(true);
-//			}
-//		}
-//		
+
 		if(future == null){
 			Callable<V> callableToExecute = new ComputableCallable<T, V>(_computable, computableKey_);
 			FutureTask<V> futueTask = new FutureTask<V>(callableToExecute);

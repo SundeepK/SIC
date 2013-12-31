@@ -1,9 +1,7 @@
 package com.sun.imageloader.core;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.net.URI;
 
+import java.net.URI;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -16,7 +14,6 @@ public class ImageSettings  extends Settings{
 
 
 	private final ImageView _imageView;
-//	private final Reference<ImageView>_imageView;
 	private final int _width;
 	private final int _height;
 	private final boolean  _shouldUseSampleSizeFromImageKey;

@@ -3,7 +3,6 @@ package com.sun.imageloader.cache.impl;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;

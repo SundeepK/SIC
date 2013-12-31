@@ -1,10 +1,8 @@
 package com.sun.imageloader.core;
 
 import java.io.InputStream;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.widget.ImageView;
@@ -20,7 +18,6 @@ public class ImageLoaderTask implements Runnable {
 	private final ImageSettings _imageSettings;
 	private final Handler _handler;
 	private final ImageTaskListener _imageListener;
-	private final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap;
 	private final FlingLock _flingLock;
 
 	/**
@@ -39,23 +36,19 @@ public class ImageLoaderTask implements Runnable {
 	 * 			listener needed to perform special operations at certain events
 	 */
 	public ImageLoaderTask(IMemorizer<ImageSettings, Bitmap> bitmapMemoizer_,
-			ImageSettings imageSetings_, Handler handler_, ImageTaskListener listener_, 
-			ConcurrentHashMap<Integer, ImageKey> viewKeyMap_, FlingLock flingLock_) {
+			ImageSettings imageSetings_, Handler handler_, ImageTaskListener listener_, FlingLock flingLock_) {
 		_bitmapMemoizer =bitmapMemoizer_;
 		_imageSettings = imageSetings_;
 		_handler = handler_;
 		_imageListener = listener_;
-		_viewKeyMap = viewKeyMap_;
 		_flingLock = flingLock_;
 	}
 	
 	private boolean isViewStillValid(ImageSettings imageSettings_) {
-		int viewKey = imageSettings_.getImageView().hashCode();
 			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{
-				_viewKeyMap.remove(viewKey);
 				L.v(TAG, "View is invalid now");
 				return false;
 			}
@@ -117,7 +110,7 @@ public class ImageLoaderTask implements Runnable {
 	
 	private void postDisplayImage(Bitmap decodedImage_) {
 		_handler.post(new DisplayImageTask(_imageSettings,
-				decodedImage_, _imageListener, _viewKeyMap));
+				decodedImage_, _imageListener));
 	}
 
 }

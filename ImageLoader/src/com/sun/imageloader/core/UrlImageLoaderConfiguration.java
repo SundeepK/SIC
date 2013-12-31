@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -17,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
-
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.cache.impl.DiskCache;
 import com.sun.imageloader.cache.impl.LRUCache;
@@ -38,7 +35,6 @@ final public class UrlImageLoaderConfiguration {
 	final Handler _imageViewUpdateHandler;
 	final MemoryCache<ImageKey, File> _diskCache;
 	final IMemorizer<ImageSettings, Bitmap> _bitmapMemorizer;
-    final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap; // Associate {@link ImageView} and image being loaded using a unique key in an internal {@link SparseArray}. 
 	final ImageTaskListener _taskListener;
 	final File _diskCacheLocation;
 	final int _imageQuality;
@@ -54,7 +50,6 @@ final public class UrlImageLoaderConfiguration {
 		_lruMemoryCache = builder._memoryCache;
 		_imageViewUpdateHandler = builder._imageViewUpdateHandler;
 		_diskCache = builder._diskCache;
-		_viewKeyMap = builder._viewKeyMap;
 		_taskListener = builder._taskListener;
 		_diskCacheLocation = builder._diskCacheLocation;
 		_imageQuality = builder._imageQuality;
