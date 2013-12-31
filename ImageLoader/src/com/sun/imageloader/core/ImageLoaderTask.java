@@ -48,13 +48,27 @@ public class ImageLoaderTask implements Runnable {
 		_viewKeyMap = viewKeyMap_;
 		_flingLock = flingLock_;
 	}
-
+	
+	private boolean isViewStillValid(ImageSettings imageSettings_) {
+		int viewKey = imageSettings_.getImageView().hashCode();
+			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
+				L.v(TAG, "View is still valid");
+				return true;
+			}else{
+				_viewKeyMap.remove(viewKey);
+				L.v(TAG, "View is invalid now");
+				return false;
+			}
+	}
 	/**
 	 * perform the task of retrieving the {@link Bitmap} and loading it onto an {@link ImageView}
 	 */
 	@Override
 	public void run() {
 		attemptToWaitIfFling();
+		if(!isViewStillValid(_imageSettings))
+			return;
+		
 		Bitmap decodedImage = loadBitmap();
 		if(decodedImage != null){
 			postDisplayImage(decodedImage);

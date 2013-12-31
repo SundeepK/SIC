@@ -124,16 +124,6 @@ public class UrlImageLoader implements OnScrollListener {
 	public void displayImage(String uri_, ImageView imageView_,
 			int sampleSize_, ImageTaskListener listener_) throws URISyntaxException {
 		checkConfiguration();
-		
-//		switch (scroll_state) {
-//		case OnScrollListener.SCROLL_STATE_IDLE:
-//			break;
-//		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-//			return;
-//		case OnScrollListener.SCROLL_STATE_FLING:
-//			return;
-//		}
-
 
 		
 		if (imageView_ == null) {
@@ -145,11 +135,6 @@ public class UrlImageLoader implements OnScrollListener {
 			
 		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
 
-//		if (!SCROLL_STATE_IDLE){
-//			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
-//			_jobQueue.add(imageSpecificSettings);
-//			return;		
-//		}
 		
 		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
 		imageView_.setTag(imageSpecificSettings.getImageKey());

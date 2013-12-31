@@ -32,21 +32,16 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 	
 	protected abstract Callable<V> getCallable(T computable_);
 	
-	private boolean isViewValid(ImageSettings imageSettings_) {
+	private boolean isViewStillValid(ImageSettings imageSettings_) {
 		int viewKey = imageSettings_.getImageView().hashCode();
-		ImageKey key = _viewKeyMap.get(viewKey);
-		
-		if (key != null) {
-			if (key.equals(imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey()))){
+			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{
-				L.v(TAG, "View is invalid now");
 				_viewKeyMap.remove(viewKey);
+				L.v(TAG, "View is invalid now");
 				return false;
 			}
-		}
-		return true;
 	}
 	
 	@Override
@@ -57,13 +52,13 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 		Future<V> future = _bitmapFutureCache.get(key);
 		V returnValue = null;
 		
-		
-		if(!isViewValid(computableKey_)){
-			if(future != null){
-				future.cancel(true);
-			}
-		}
-		
+//		
+//		if(!isViewValid(computableKey_)){
+//			if(future != null){
+//				future.cancel(true);
+//			}
+//		}
+//		
 		if(future == null){
 			Callable<V> callableToExecute = new ComputableCallable<T, V>(_computable, computableKey_);
 			FutureTask<V> futueTask = new FutureTask<V>(callableToExecute);

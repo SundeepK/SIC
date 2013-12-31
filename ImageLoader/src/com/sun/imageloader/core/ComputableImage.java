@@ -203,9 +203,7 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 	private boolean isViewStillValid(ImageSettings imageSettings_) {
 		int viewKey = imageSettings_.getImageView().hashCode();
-		ImageKey key = _viewKeyMap.get(viewKey); // && (imageSettings_.getImageView().getTag().equals(key.getImageFilename()))
-		if (key != null) {
-			if (imageSettings_.getImageView().getTag().equals(key)) {
+			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{
@@ -213,8 +211,6 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 				L.v(TAG, "View is invalid now");
 				return false;
 			}
-		}
-		return true;
 	}
 
 

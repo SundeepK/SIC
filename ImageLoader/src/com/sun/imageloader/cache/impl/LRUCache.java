@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.graphics.Bitmap;
 
@@ -19,6 +20,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	private int _currentSizeMemory;
 	private static final String TAG = LRUCache.class.getName();
 	private Object _putLock = new Object();
+	private AtomicBoolean _isAlreadyTrimmingCache = new AtomicBoolean();
 //	public enum MemorySize {
 //		
 //	}
@@ -63,16 +65,19 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 
 		L.v(TAG, "Current memory: " + _currentSizeMemory);
 
-		trimeCache(_maxSizeMemory);
+		if (!_isAlreadyTrimmingCache.get()) {
+			trimeCache(_maxSizeMemory);
+		}
 		return true;
 	}
 	
 	/**
-	 * Trime dat hardcache yo, if it it's taking too much memory....pfft
+	 * Trime the cache size
 	 *  
 	 * @param maxMemorySize_
 	 */
 	protected synchronized void trimeCache(int maxMemorySize_) {
+		_isAlreadyTrimmingCache.getAndSet(true);
 		L.v(TAG, "Inside trime method, current max memopry size is in bytes: " + maxMemorySize_ + " cache size: " +_lruHardCache.size() );
 		while(_currentSizeMemory >= maxMemorySize_){
 			
@@ -94,6 +99,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 				super.put(bitMapToRemoveKey, bitMapToRemove);
 				_lruHardCache.remove(bitMapToRemoveKey);		
 		}
+		_isAlreadyTrimmingCache.getAndSet(false);
 	}
 
 	@Override

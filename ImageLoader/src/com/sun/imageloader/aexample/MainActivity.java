@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
                      new LinkedBlockingQueue<Runnable>());
 
              UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
-             .setDirectoryName("/storage/extSdCard/Test").setImageQuality(100).setMaxCacheMemorySize(1)
+             .setDirectoryName("/storage/extSdCard/Test").setImageQuality(100).setMaxCacheMemorySize(10)
              .shouldLog(true).setImageType(CompressFormat.JPEG).useExternalStorage(true)
              .setThreadExecutor(executor).setOnloadingImage(new ColorDrawable(Color.BLACK)). 
              build(this);
