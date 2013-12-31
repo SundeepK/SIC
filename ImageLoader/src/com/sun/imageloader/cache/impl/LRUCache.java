@@ -18,7 +18,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	private final ConcurrentMap<ImageKey, Bitmap> _lruHardCache;
 	private int _currentSizeMemory;
 	private static final String TAG = LRUCache.class.getName();
-	
+	private Object _putLock = new Object();
 //	public enum MemorySize {
 //		
 //	}
@@ -53,9 +53,12 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 
 		Bitmap previousBitmap;
 		previousBitmap = _lruHardCache.put(key_, value_);
-		_currentSizeMemory += sizeOfValue(value_);
-		if (previousBitmap != null) {
-			_currentSizeMemory -= sizeOfValue(value_);
+		
+		synchronized (_putLock) {
+			_currentSizeMemory += sizeOfValue(value_);
+			if (previousBitmap != null) {
+				_currentSizeMemory -= sizeOfValue(value_);
+			}
 		}
 
 		L.v(TAG, "Current memory: " + _currentSizeMemory);
@@ -132,7 +135,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 
 	
 	protected void remove(String key_) {
-			_lruHardCache.remove(key_);
+		_lruHardCache.remove(key_);
 	}
 
 	@Override
