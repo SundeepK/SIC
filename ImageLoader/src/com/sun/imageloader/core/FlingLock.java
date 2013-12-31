@@ -7,22 +7,22 @@ public class FlingLock {
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 	private final Object pauseLock = new Object();
 
-	void pause() {
+	public void pause() {
 		paused.set(true);
 	}
 	
-	void resume() {
+	public void resume() {
 		paused.set(false);
 		synchronized (pauseLock) {
 			pauseLock.notifyAll();
 		}
 	}
 	
-	Object getPauseLock() {
+	public Object getPauseLock() {
 		return pauseLock;
 	}
 	
-	AtomicBoolean getPause() {
+	public	AtomicBoolean getPause() {
 		return paused;
 	}
 

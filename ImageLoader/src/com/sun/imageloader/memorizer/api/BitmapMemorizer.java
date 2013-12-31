@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.Bitmap;
 
+import com.sun.imageloader.computable.impl.Computable;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;
 

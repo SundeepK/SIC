@@ -18,7 +18,6 @@ import com.sun.imageloader.imagedecoder.utils.L;
 public class DiskCache implements MemoryCache<ImageKey, File> {
 
 	private static final String TAG = DiskCache.class.getName();
-
 	private File _diskCacheLocationDir;
 	private final ConcurrentMap<ImageKey, Reference<File>> _imageFiles;
 

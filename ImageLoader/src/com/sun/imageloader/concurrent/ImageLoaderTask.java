@@ -1,4 +1,4 @@
-package com.sun.imageloader.core;
+package com.sun.imageloader.concurrent;
 
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
@@ -6,7 +6,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.widget.ImageView;
-import com.sun.imageloader.concurrent.DisplayImageTask;
+
+import com.sun.imageloader.core.FlingLock;
+import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.utils.L;
 import com.sun.imageloader.memorizer.api.IMemorizer;

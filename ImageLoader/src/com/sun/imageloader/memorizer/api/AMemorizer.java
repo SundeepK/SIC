@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import com.sun.imageloader.computable.impl.Computable;
 import com.sun.imageloader.concurrent.ComputableCallable;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;

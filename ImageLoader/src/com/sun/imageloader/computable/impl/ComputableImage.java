@@ -1,4 +1,4 @@
-package com.sun.imageloader.core;
+package com.sun.imageloader.computable.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 import com.sun.imageloader.cache.api.MemoryCache;
+import com.sun.imageloader.concurrent.ImageLoaderTask;
+import com.sun.imageloader.core.ImageKey;
+import com.sun.imageloader.core.ImageSettings;
+import com.sun.imageloader.core.ImageWriter;
 import com.sun.imageloader.core.api.FailedTaskReason;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.core.api.FailedTaskReason.ExceptionType;
@@ -16,7 +20,6 @@ import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
-import com.sun.imageloader.memorizer.api.Computable;
 import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
 
 public class ComputableImage implements Computable<ImageSettings, Bitmap> {

@@ -8,6 +8,7 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.AbsListView.OnScrollListener;
 import com.sun.imageloader.concurrent.DisplayImageTask;
+import com.sun.imageloader.concurrent.ImageLoaderTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.utils.KeyUtils;
 import com.sun.imageloader.imagedecoder.utils.L;
@@ -21,28 +22,15 @@ public class UrlImageLoader implements OnScrollListener {
 	private static final String ERROR_WRONG_ARGUMENTS = "Wrong arguments supplied";
 	private UrlImageLoaderConfiguration _ImageLoaderConfig;
 	private UrlImageTaskExecutor _urlImageLoaderTaskExecutor;
-	private volatile static UrlImageLoader urlImageLoaderInstance;
-
-	/** Returns singleton class instance */
-	public static UrlImageLoader getInstance() {
-		if (urlImageLoaderInstance == null) {
-			synchronized (UrlImageLoader.class) {
-				if (urlImageLoaderInstance == null) {
-					urlImageLoaderInstance = new UrlImageLoader();
-				}
-			}
-		}
-		return urlImageLoaderInstance;
-	}
 	
 	public void invalidate(){
 			synchronized (UrlImageLoader.class) {
-					urlImageLoaderInstance = null;
 					_ImageLoaderConfig = null;
 		}
 	}
 
-	protected UrlImageLoader() {
+	public UrlImageLoader(UrlImageLoaderConfiguration configuration_) {
+		init(configuration_);
 	}
 
 	/**
@@ -118,28 +106,43 @@ public class UrlImageLoader implements OnScrollListener {
 		if (listener_ == null) {
 			listener_ = _ImageLoaderConfig._taskListener;
 		}
-			
-		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
 		
-		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
-		imageView_.setTag(imageSpecificSettings.getImageKey());
+		//Get the ImageSettings specific to the image to load and the ImageView
+		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
+		Bitmap bmp = attemptLoadBitmapFromCache(imageSpecificSettings);
+		
+		//important, tag the view so we know is it reused or not in the future.
+		//the same view can be tagged multiple times, we check the ImageKey associated with the View
+		//when we attempt to load the image in a thread
+		tagImageView(imageSpecificSettings); 
 
 		if (bmp != null && !bmp.isRecycled()) {
 			L.v( TAG,  "Loaded bitmap image from cache, using url: " + uri_);
-			
 			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_);
 			_ImageLoaderConfig._imageViewUpdateHandler.post(displayTask);
-					
 		}else{
-			L.v( TAG,  "No image found in cache, attempting to fetch image via network or disk: " + uri_);
-			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
-			ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
-					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, 
-					listener_, _ImageLoaderConfig._flingLock);
-			_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
-			
+			startNewImageLoadTask(imageSpecificSettings, listener_);
 		}
 	
+	}
+	
+	private void tagImageView(ImageSettings imageSpecificSettings_){
+		ImageView imageView = imageSpecificSettings_.getImageView();
+		imageView.setTag(imageSpecificSettings_.getImageKey());
+	}
+	
+	private Bitmap attemptLoadBitmapFromCache(ImageSettings imageSpecificSettings_){
+		return _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings_.getImageKey());
+	}
+	
+	private void startNewImageLoadTask(ImageSettings imageSpecificSettings_, ImageTaskListener listener_){
+		ImageView imageView  =  imageSpecificSettings_.getImageView();
+		L.v( TAG,  "No image found in cache, attempting to fetch image via network or disk: " + imageSpecificSettings_.getUrl());
+		imageView.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
+		ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
+				imageSpecificSettings_,  _ImageLoaderConfig._imageViewUpdateHandler, 
+				listener_, _ImageLoaderConfig._flingLock);
+		_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
 	}
 	
 

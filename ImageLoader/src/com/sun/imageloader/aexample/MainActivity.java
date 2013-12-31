@@ -29,8 +29,6 @@ public class MainActivity extends Activity {
 	 private ListView listView;
 	 UrlImageLoader sicImageLoader;
 
-
-	 
 	@Override
      public void onCreate(Bundle savedInstanceState) {
              super.onCreate(savedInstanceState);
@@ -44,8 +42,8 @@ public class MainActivity extends Activity {
              .setThreadExecutor(executor).setOnloadingImage(new ColorDrawable(Color.BLACK)). 
              build(this);
              
-             UrlImageLoader.getInstance().init(configs);
-              sicImageLoader = UrlImageLoader.getInstance();
+            
+             sicImageLoader = new UrlImageLoader(configs);
 
              listView = (ListView) findViewById(R.id.listView);
              ((ListView) listView).setAdapter(new ItemAdapter());

@@ -18,12 +18,13 @@ import android.text.TextUtils;
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.cache.impl.DiskCache;
 import com.sun.imageloader.cache.impl.LRUCache;
+import com.sun.imageloader.computable.impl.Computable;
+import com.sun.imageloader.computable.impl.ComputableImage;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
 import com.sun.imageloader.memorizer.api.BitmapMemorizer;
-import com.sun.imageloader.memorizer.api.Computable;
 import com.sun.imageloader.memorizer.api.IMemorizer;
 
 
