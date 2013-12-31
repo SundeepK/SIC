@@ -1,6 +1,7 @@
 package com.sun.imageloader.core;
 
 import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -17,6 +18,8 @@ public class ImageLoaderTask implements Runnable {
 	private final ImageSettings _imageSettings;
 	private final Handler _handler;
 	private final ImageTaskListener _imageListener;
+	private final ConcurrentHashMap<Integer, ImageKey> _viewKeyMap;
+
 	/**
 	 * {@link ImageLoaderTask} is used to perform the long task to retrieving the {@link Bitmap} from either the internal cache, disk or from a network call.
 	 * 
@@ -33,11 +36,12 @@ public class ImageLoaderTask implements Runnable {
 	 * 			listener needed to perform special operations at certain events
 	 */
 	public ImageLoaderTask(IMemorizer<ImageSettings, Bitmap> bitmapMemoizer_,
-			ImageSettings imageSetings_, Handler handler_, ImageTaskListener listener_) {
+			ImageSettings imageSetings_, Handler handler_, ImageTaskListener listener_, ConcurrentHashMap<Integer, ImageKey> viewKeyMap_) {
 		_bitmapMemoizer =bitmapMemoizer_;
 		_imageSettings = imageSetings_;
 		_handler = handler_;
 		_imageListener = listener_;
+		_viewKeyMap = viewKeyMap_;
 	}
 
 	/**
@@ -76,7 +80,7 @@ public class ImageLoaderTask implements Runnable {
 	
 	private void postDisplayImage(Bitmap decodedImage_) {
 		_handler.post(new DisplayImageTask(_imageSettings,
-				decodedImage_, _imageListener));
+				decodedImage_, _imageListener, _viewKeyMap));
 	}
 
 }

@@ -13,6 +13,8 @@ import com.sun.imageloader.core.api.Settings;
 
 public class ImageSettings  extends Settings{
 
+
+
 	private final ImageView _imageView;
 //	private final Reference<ImageView>_imageView;
 	private final int _width;
@@ -85,4 +87,41 @@ public class ImageSettings  extends Settings{
 	public boolean shouldUseSampleSizeFromImageKey() {
 		return _shouldUseSampleSizeFromImageKey;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + _height;
+		result = prime * result
+				+ ((_imageView == null) ? 0 : _imageView.hashCode());
+		result = prime * result
+				+ (_shouldUseSampleSizeFromImageKey ? 1231 : 1237);
+		result = prime * result + _width;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ImageSettings other = (ImageSettings) obj;
+		if (_height != other._height)
+			return false;
+		if (_imageView == null) {
+			if (other._imageView != null)
+				return false;
+		} else if (!_imageView.equals(other._imageView))
+			return false;
+		if (_shouldUseSampleSizeFromImageKey != other._shouldUseSampleSizeFromImageKey)
+			return false;
+		if (_width != other._width)
+			return false;
+		return true;
+	}
+	
 }

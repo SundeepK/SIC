@@ -227,7 +227,7 @@ final public class UrlImageLoaderConfiguration {
 						_diskCache, _imageWriter, _taskListener,_viewKeyMap);	
 
 			if(_bimapMemorizer == null)
-				_bimapMemorizer = new BitmapMemorizer(_computable);
+				_bimapMemorizer = new BitmapMemorizer(_computable, _viewKeyMap);
 			
 		
 				

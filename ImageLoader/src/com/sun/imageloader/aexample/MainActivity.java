@@ -27,6 +27,8 @@ public class MainActivity extends Activity {
 	 private ListView listView;
 	 UrlImageLoader sicImageLoader;
 
+
+	 
 	@Override
      public void onCreate(Bundle savedInstanceState) {
              super.onCreate(savedInstanceState);

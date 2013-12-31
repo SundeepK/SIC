@@ -128,19 +128,19 @@ public class UrlImageLoader {
 
 		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
 
+		_ImageLoaderConfig._viewKeyMap.put(imageView_.hashCode(), imageSpecificSettings.getImageKey());
 
 		if (bmp != null && !bmp.isRecycled()) {
 			L.v( TAG,  "Loaded bitmap image from cache, using url: " + uri_);
 			
-			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_);
+			DisplayImageTask displayTask = new DisplayImageTask(imageSpecificSettings, bmp, listener_, _ImageLoaderConfig._viewKeyMap);
 			_ImageLoaderConfig._imageViewUpdateHandler.post(displayTask);
 					
 		}else{
-			
 			L.v( TAG,  "No image found in cache, attempting to fetch image via network or disk: " + uri_);
 			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
 			ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
-					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, listener_);
+					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, listener_, _ImageLoaderConfig._viewKeyMap);
 			_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
 			
 		}
