@@ -36,8 +36,7 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 	public DiskCache(File diskCacheLocationDir_, int maxFilesToCache_,
 			boolean shouldLoadAllFilesFromDisk_) {
 		_diskCacheLocationDir = diskCacheLocationDir_;
-		_imageFiles = new ConcurrentHashMap<ImageKey, Reference<File>>(0, 0.75f,
-				1);
+		_imageFiles = new ConcurrentHashMap<ImageKey, Reference<File>>(0, 0.75f);
 
 		if (shouldLoadAllFilesFromDisk_)
 			loadImagesFromDisk(_imageFiles);

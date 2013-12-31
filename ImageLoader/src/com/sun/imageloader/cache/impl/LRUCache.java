@@ -20,6 +20,8 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	private static final String TAG = LRUCache.class.getName();
 	private Object _putLock = new Object();
 	private AtomicBoolean _isAlreadyTrimmingCache = new AtomicBoolean();
+	private static final int MAX_WEIGHTED_CAP = 50;
+	private static final int INITAIL_CAP = 20;
 //	public enum MemorySize {
 //		
 //	}
@@ -33,8 +35,8 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	public LRUCache(int maxSizeMemory_) {
 		super(maxSizeMemory_);
 		_lruHardCache = new ConcurrentLinkedHashMap.Builder<ImageKey, Bitmap>()
-			    .maximumWeightedCapacity(50)
-				.initialCapacity(20)
+			    .maximumWeightedCapacity(MAX_WEIGHTED_CAP)
+				.initialCapacity(INITAIL_CAP)
 				.build();
 	}
 

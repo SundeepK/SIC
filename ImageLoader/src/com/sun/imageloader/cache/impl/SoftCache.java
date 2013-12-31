@@ -22,7 +22,7 @@ public abstract class SoftCache<K, V> implements MemoryCache<K, V> {
 	 * 			the max memory the cache should consume in MB. For example, a value of 1 will limit the cache to consume no more than 1MB.
 	 */
 	public SoftCache(int maxSizeMemory_) {
-		_lruSoftMap = new ConcurrentHashMap<K, Reference<V>>(8, 0.9f, 1);
+		_lruSoftMap = new ConcurrentHashMap<K, Reference<V>>(8, 0.9f);
 		_maxSizeMemory = maxSizeMemory_ * ONE_MB;
 	}
 
