@@ -90,6 +90,10 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	private Bitmap loadBitmap(ImageSettings imageSettings_) throws InterruptedImageLoadException {
 
 		Bitmap imageToRetreive = null;
+		
+		if(!isViewStillValid(imageSettings_))
+			return null;
+		
 		try {
 
 			imageToRetreive = tryLoadImageFromDisk(imageSettings_);
@@ -201,7 +205,7 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 		int viewKey = imageSettings_.getImageView().hashCode();
 		ImageKey key = _viewKeyMap.get(viewKey); // && (imageSettings_.getImageView().getTag().equals(key.getImageFilename()))
 		if (key != null) {
-			if (key.equals(imageSettings_.getImageKey())) {
+			if (imageSettings_.getImageView().getTag().equals(key)) {
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{

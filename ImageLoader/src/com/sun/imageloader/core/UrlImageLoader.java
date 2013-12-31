@@ -2,10 +2,13 @@ package com.sun.imageloader.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
@@ -13,19 +16,24 @@ import com.sun.imageloader.imagedecoder.utils.KeyUtils;
 import com.sun.imageloader.imagedecoder.utils.L;
 
 
-public class UrlImageLoader {
+public class UrlImageLoader implements OnScrollListener {
 
 	protected static final String TAG = UrlImageLoader.class.getName();
-
 	private static final String ERROR_INIT_CONFIG_NULL = "UrlImageLoader cannot be instantiated with a null UrlImageLoaderConfiguration";
-
 	private static final String ERROR_NOT_INIT = "UrlImageLoaderConfiguration is null, call init()";
-
 	private static final String ERROR_WRONG_ARGUMENTS = "Wrong arguments supplied";
-
 	private UrlImageLoaderConfiguration _ImageLoaderConfig;
 	private UrlImageTaskExecutor _urlImageLoaderTaskExecutor;
-
+//	private int SCROLL_STATE_IDLE;
+//	private int	SCROLL_STATE_TOUCH_SCROLL;
+//	private int SCROLL_STATE_FLING;
+	private int scroll_state;
+	
+	
+	private boolean SCROLL_STATE_IDLE;
+	private boolean	SCROLL_STATE_TOUCH_SCROLL;
+	private boolean SCROLL_STATE_FLING;
+	
 	private volatile static UrlImageLoader urlImageLoaderInstance;
 
 	/** Returns singleton class instance */
@@ -116,7 +124,18 @@ public class UrlImageLoader {
 	public void displayImage(String uri_, ImageView imageView_,
 			int sampleSize_, ImageTaskListener listener_) throws URISyntaxException {
 		checkConfiguration();
+		
+//		switch (scroll_state) {
+//		case OnScrollListener.SCROLL_STATE_IDLE:
+//			break;
+//		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+//			return;
+//		case OnScrollListener.SCROLL_STATE_FLING:
+//			return;
+//		}
 
+
+		
 		if (imageView_ == null) {
 			throw new IllegalArgumentException(ERROR_WRONG_ARGUMENTS);
 		}
@@ -126,10 +145,16 @@ public class UrlImageLoader {
 			
 		ImageSettings imageSpecificSettings = getImageSettings(uri_, sampleSize_, imageView_);
 
+//		if (!SCROLL_STATE_IDLE){
+//			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
+//			_jobQueue.add(imageSpecificSettings);
+//			return;		
+//		}
+		
 		Bitmap bmp = _ImageLoaderConfig._lruMemoryCache.getValue(imageSpecificSettings.getImageKey());
+		imageView_.setTag(imageSpecificSettings.getImageKey());
 
 		_ImageLoaderConfig._viewKeyMap.put(imageView_.hashCode(), imageSpecificSettings.getImageKey());
-
 		if (bmp != null && !bmp.isRecycled()) {
 			L.v( TAG,  "Loaded bitmap image from cache, using url: " + uri_);
 			
@@ -140,12 +165,19 @@ public class UrlImageLoader {
 			L.v( TAG,  "No image found in cache, attempting to fetch image via network or disk: " + uri_);
 			imageView_.setImageDrawable(_ImageLoaderConfig._onLoadingDrawable);
 			ImageLoaderTask	displayTask = new ImageLoaderTask(_ImageLoaderConfig._bitmapMemorizer, 
-					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, listener_, _ImageLoaderConfig._viewKeyMap);
+					imageSpecificSettings,  _ImageLoaderConfig._imageViewUpdateHandler, 
+					listener_, _ImageLoaderConfig._viewKeyMap, _ImageLoaderConfig._flingLock);
 			_urlImageLoaderTaskExecutor.sumbitTask(displayTask);
 			
 		}
 	
 	}
+	
+	
+//	private boolean checkListViewState(){
+//		if(SCROLL_STATE_IDLE)
+//
+//	}
 	
 	private ImageSettings getImageSettings(String uri_, int sampleSize_, ImageView imageView_) throws URISyntaxException{
 		URI imageUri = new URI(uri_);
@@ -159,6 +191,37 @@ public class UrlImageLoader {
 	private void checkConfiguration() {
 		if (_ImageLoaderConfig == null) {
 			throw new IllegalStateException(ERROR_NOT_INIT);
+		}
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {		
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		scroll_state = scrollState;
+
+		switch (scrollState) {
+		case OnScrollListener.SCROLL_STATE_IDLE:
+			_ImageLoaderConfig._flingLock.resume();
+			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_IDLE);
+
+			SCROLL_STATE_IDLE = true;
+			break;
+		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+			_ImageLoaderConfig._flingLock.resume();
+
+			SCROLL_STATE_IDLE = true;
+			break;
+		case OnScrollListener.SCROLL_STATE_FLING:
+			L.v(TAG, ""+ OnScrollListener.SCROLL_STATE_FLING);
+			_ImageLoaderConfig._flingLock.pause();
+
+			SCROLL_STATE_IDLE = false;
+			break;
 		}
 	}
 

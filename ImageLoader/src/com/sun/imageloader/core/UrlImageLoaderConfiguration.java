@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,6 +47,7 @@ final public class UrlImageLoaderConfiguration {
 	final ThreadPoolExecutor _threadPoolForTaskExecutor;
 	final Drawable _onLoadingDrawable;
 	final Computable<ImageSettings, Bitmap> _computable;
+	final FlingLock _flingLock = new FlingLock();
 
 
 	private UrlImageLoaderConfiguration (Builder builder){

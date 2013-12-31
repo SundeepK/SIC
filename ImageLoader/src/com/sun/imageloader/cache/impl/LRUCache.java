@@ -69,7 +69,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	 *  
 	 * @param maxMemorySize_
 	 */
-	protected  void trimeCache(int maxMemorySize_) {
+	protected synchronized void trimeCache(int maxMemorySize_) {
 		L.v(TAG, "Inside trime method, current max memopry size is in bytes: " + maxMemorySize_ + " cache size: " +_lruHardCache.size() );
 		while(_currentSizeMemory >= maxMemorySize_){
 			

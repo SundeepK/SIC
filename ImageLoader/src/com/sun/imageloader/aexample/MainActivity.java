@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -37,7 +39,7 @@ public class MainActivity extends Activity {
                      new LinkedBlockingQueue<Runnable>());
 
              UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
-             .setDirectoryName("/storage/extSdCard/Test").setImageQuality(100).setMaxCacheMemorySize(10)
+             .setDirectoryName("/storage/extSdCard/Test").setImageQuality(100).setMaxCacheMemorySize(1)
              .shouldLog(true).setImageType(CompressFormat.JPEG).useExternalStorage(true)
              .setThreadExecutor(executor).setOnloadingImage(new ColorDrawable(Color.BLACK)). 
              build(this);
@@ -47,6 +49,20 @@ public class MainActivity extends Activity {
 
              listView = (ListView) findViewById(R.id.listView);
              ((ListView) listView).setAdapter(new ItemAdapter());
+             listView.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					sicImageLoader.onScrollStateChanged(view, scrollState);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
  
      }
 

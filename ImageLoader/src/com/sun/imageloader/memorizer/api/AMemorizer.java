@@ -32,13 +32,12 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 	
 	protected abstract Callable<V> getCallable(T computable_);
 	
-	private boolean ifExists(ImageSettings imageSettings_) {
+	private boolean isViewValid(ImageSettings imageSettings_) {
 		int viewKey = imageSettings_.getImageView().hashCode();
 		ImageKey key = _viewKeyMap.get(viewKey);
 		
 		if (key != null) {
-			if (key.equals(imageSettings_.getImageKey())
-					) {
+			if (key.equals(imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey()))){
 				L.v(TAG, "View is still valid");
 				return true;
 			}else{
@@ -52,10 +51,18 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 	
 	@Override
 	public V executeComputable(T computableKey_) throws InterruptedImageLoadException, ExecutionException {
+
 		
 		ImageKey key = computableKey_.getImageKey();
 		Future<V> future = _bitmapFutureCache.get(key);
 		V returnValue = null;
+		
+		
+		if(!isViewValid(computableKey_)){
+			if(future != null){
+				future.cancel(true);
+			}
+		}
 		
 		if(future == null){
 			Callable<V> callableToExecute = new ComputableCallable<T, V>(_computable, computableKey_);

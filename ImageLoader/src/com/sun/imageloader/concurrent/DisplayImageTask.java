@@ -34,18 +34,20 @@ public class DisplayImageTask implements Runnable {
 	
 	@Override
 	public void run() {
-		_taskListener.preImageLoad(_imageSettings);
-		_imageSettings.getImageView().setImageBitmap(_bitmap);
-		_taskListener.onImageLoadComplete(_bitmap, _imageSettings);
-		
-//        if(_imageSettings == null){
-//            
-//        }else if(_imageSettings.getImageKey().equals(_viewKeyMap.get(_imageSettings.getImageView().hashCode()))){
-//                    _imageSettings.getImageView().setImageBitmap(_bitmap);
-//                    _viewKeyMap.remove(_imageSettings.getImageView().hashCode());
-//            }
-//         _taskListener.onImageLoadComplete(_bitmap, _imageSettings);
-		
-	}
+			if (_imageSettings.getImageView().getTag().equals(_imageSettings.getImageKey())){
+			_taskListener.preImageLoad(_imageSettings);
+			_imageSettings.getImageView().setImageBitmap(_bitmap);
+			_taskListener.onImageLoadComplete(_bitmap, _imageSettings);
+		}
+//	       if(_imageSettings == null){
+//	            
+//	        }else if(_imageSettings.getImageKey().equals(_viewKeyMap.get(_imageSettings.getImageView().hashCode()))){
+//	                    _imageSettings.getImageView().setImageBitmap(_bitmap);
+//	                    _viewKeyMap.remove(_imageSettings.getImageView().hashCode());
+//	            }
+//	         _taskListener.onImageLoadComplete(_bitmap, _imageSettings);
+//	         
+		}
+
 
 }
