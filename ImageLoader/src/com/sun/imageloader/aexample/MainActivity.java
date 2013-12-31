@@ -105,7 +105,7 @@ public class MainActivity extends Activity {
                      holder.text.setText("Item " + (position + 1));
                      
                     try {
-						sicImageLoader.displayImage(imageUrls[position], holder.image, 1);
+						sicImageLoader.displayImage(imageUrls[position], holder.image, 2);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					}
