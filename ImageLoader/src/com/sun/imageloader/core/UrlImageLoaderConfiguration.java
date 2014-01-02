@@ -96,7 +96,7 @@ final public class UrlImageLoaderConfiguration {
 		 * 			the max memory in MB the internal cache should occupy
 		 * @return
 		 */
-		public Builder setMaxCacheMemorySize(int maxCacheMemorySizeInMB_){
+		public Builder setMaxCacheMemorySize(int maxCacheMemorySizeInMB_ ){
 			long availableMemory = Runtime.getRuntime().maxMemory();	
 			if(maxCacheMemorySizeInMB_ > availableMemory || maxCacheMemorySizeInMB_ <= 0)
 				throw new IllegalArgumentException("The specified memory to allocate for cache is larger than the current heap size or is <= 0");

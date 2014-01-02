@@ -46,7 +46,7 @@ public class SimpleImageDecoder implements ImageDecoder {
 					bmp = resizeBitmapToFitDest(bitmapStream_, options, settings_);
 				
 				}else{
-					bmp =	decodeImageStream( bitmapStream_, options);		
+					bmp = decodeImageStream( bitmapStream_, options);		
 				}
 			}else{
 				bmp = BitmapFactory.decodeStream(bitmapStream_);

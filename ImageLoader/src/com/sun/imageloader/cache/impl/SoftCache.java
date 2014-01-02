@@ -11,9 +11,9 @@ import com.sun.imageloader.cache.api.MemoryCache;
 
 public abstract class SoftCache<K, V> implements MemoryCache<K, V> {
 
-	protected int _maxSizeMemory;
+	private int _maxSizeMemory;
 	private final Map<K, Reference<V>> _lruSoftMap;
-	protected final static int ONE_MB = 1000000;
+	public final static int ONE_MB = 1024 * 1024;
 
 	/**
 	 * Abstract class which implements a SoftCache of references. This allows any objects to be removed at the garbage collectors own will.
@@ -22,7 +22,7 @@ public abstract class SoftCache<K, V> implements MemoryCache<K, V> {
 	 * 			the max memory the cache should consume in MB. For example, a value of 1 will limit the cache to consume no more than 1MB.
 	 */
 	public SoftCache(int maxSizeMemory_) {
-		_lruSoftMap = new ConcurrentHashMap<K, Reference<V>>(8, 0.9f);
+		_lruSoftMap = new ConcurrentHashMap<K, Reference<V>>(20, 0.75f);
 		_maxSizeMemory = maxSizeMemory_ * ONE_MB;
 	}
 
@@ -33,6 +33,10 @@ public abstract class SoftCache<K, V> implements MemoryCache<K, V> {
 	 * @return
 	 */
 	protected abstract float sizeOfValue(V value_);
+	
+	protected int getMaxCacheSizeInMB(){
+		return _maxSizeMemory;
+	}
 
 	@Override
 	public boolean put(K key_, V value_) {

@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 
              UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
              .setDirectoryName("/storage/extSdCard/Test").setImageQuality(100).setMaxCacheMemorySize(10)
-             .shouldLog(true).setImageType(CompressFormat.JPEG).useExternalStorage(true)
+             .shouldLog(true).setImageType(CompressFormat.PNG).useExternalStorage(true)
              .setThreadExecutor(executor).setOnloadingImage(new ColorDrawable(Color.BLACK)). 
              build(this);
              
@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 				
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					sicImageLoader.onScrollStateChanged(view, scrollState);
+				//	sicImageLoader.onScrollStateChanged(view, scrollState);
 				}
 				
 				@Override

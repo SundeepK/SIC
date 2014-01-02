@@ -8,37 +8,45 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.graphics.Bitmap;
+import android.media.Image;
+import android.util.Log;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.EntryWeigher;
+import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.imagedecoder.utils.L;
 
-public class LRUCache extends SoftCache<ImageKey, Bitmap>{
+public class LRUCache extends SoftCache<ImageKey, Bitmap> implements EntryWeigher<ImageKey, Bitmap>,  EvictionListener<ImageKey, Bitmap>{
 
 	private final ConcurrentMap<ImageKey, Bitmap> _lruHardCache;
 	private int _currentSizeMemory;
 	private static final String TAG = LRUCache.class.getName();
-	private Object _putLock = new Object();
 	private AtomicBoolean _isAlreadyTrimmingCache = new AtomicBoolean();
-	private static final int MAX_WEIGHTED_CAP = 50;
 	private static final int INITAIL_CAP = 20;
-//	public enum MemorySize {
-//		
-//	}
 	
 	/**
+	 * This implementation keeps a reference to {@link Bitmap} objects keyed to it's {@link ImageKey}. Once the internal cache size
+	 * reaches an internal limit specified in MB through the constructor, an item is evicted. This is then promoted to the 
+	 * softcache which maintains a {@link SoftReference} to the {@link Bitmap} object, which can be removed by when a GC happens.
 	 * 
+	 * This implementation is thread safe
 	 * 
 	 * @param maxSizeMemory_ 
 	 * 			measured in MB
 	 */
 	public LRUCache(int maxSizeMemory_) {
 		super(maxSizeMemory_);
+		Log.v(TAG, "max mem size " + getMaxCacheSizeInMB());
+		// this is where the magic happens
 		_lruHardCache = new ConcurrentLinkedHashMap.Builder<ImageKey, Bitmap>()
-			    .maximumWeightedCapacity(MAX_WEIGHTED_CAP)
+			    .maximumWeightedCapacity((getMaxCacheSizeInMB()))
 				.initialCapacity(INITAIL_CAP)
+				.weigher(this)
+				.listener(this)
 				.build();
 	}
+
 
 	@Override
 	protected float sizeOfValue(Bitmap value_) {
@@ -47,6 +55,12 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 		return memory;
 	}
 
+	/**
+	 * @param key_ {@link ImageKey} which is used to uniquely identify a {@link Bitmap} image
+	 * @param value_ the {@link Bitmap} image
+	 * 
+	 * @return true if the previous value is not null
+	 */
 	@Override
 	public boolean put(ImageKey key_, Bitmap value_) {
 
@@ -56,28 +70,34 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 
 		Bitmap previousBitmap;
 		previousBitmap = _lruHardCache.put(key_, value_);
-		
-		synchronized (_putLock) {
-			_currentSizeMemory += sizeOfValue(value_);
-			if (previousBitmap != null) {
-				_currentSizeMemory -= sizeOfValue(value_);
-			}
+				
+		if(previousBitmap != null){
+			return true;
+		}else{
+			return false;
 		}
 
-		L.v(TAG, "Current memory: " + _currentSizeMemory);
+//		synchronized (_putLock) {
+//			_currentSizeMemory += sizeOfValue(value_);
+//			if (previousBitmap != null) {
+//				_currentSizeMemory -= sizeOfValue(value_);
+//			}
+//		}
 
-		if (!_isAlreadyTrimmingCache.get()) {
-			trimeCache(_maxSizeMemory);
-		}
-		return true;
 	}
+
 	
 	/**
-	 * Trime the cache size
+	 * 
+	 * This method is now deprecated, but is still here for reference purposes.
+	 * 
+	 * Trim the cache size
 	 *  
 	 * @param maxMemorySize_
+	 * 
 	 */
-	protected synchronized void trimeCache(int maxMemorySize_) {
+	@Deprecated
+	protected void trimeCache(int maxMemorySize_) {
 		_isAlreadyTrimmingCache.getAndSet(true);
 		L.v(TAG, "Inside trime method, current max memopry size is in bytes: " + maxMemorySize_ + " cache size: " +_lruHardCache.size() );
 		while(_currentSizeMemory >= maxMemorySize_){
@@ -109,6 +129,12 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 		return softReferenceBitMap;
 	}
 
+	/**
+	 * Retrieve the {@link Bitmap} object from the internal cache
+	 * 
+	 * @param key_ the {@link Image} used to retrieve the {@link Bitmap} in the cache
+	 * @return the {@link Bitmap} image
+	 */
 	@Override
 	public Bitmap getValue(ImageKey key_) {
 		Bitmap bitMap;
@@ -148,6 +174,20 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap>{
 	@Override
 	public Collection<ImageKey> getKeys() {
 		return super.getKeys();
+	}
+
+
+
+	@Override 
+	public int weightOf(ImageKey key, Bitmap value) {
+		    float bytes = sizeOfValue(value);
+		    return (int) bytes;
+	}
+
+	@Override
+	public void onEviction(ImageKey key_, Bitmap value_) {
+		Log.v(TAG, "Evicted ImageKey=" + key_ + ", with bitmap size=" + sizeOfValue(value_));
+		super.put(key_, value_);
 	}
 	
 	
