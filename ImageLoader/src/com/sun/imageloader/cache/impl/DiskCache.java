@@ -74,9 +74,7 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 							L.v(TAG, imageFile.getAbsolutePath());
 						}
 					}
-
 				}
-
 			}
 		}).start();
 		
