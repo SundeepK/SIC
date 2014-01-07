@@ -10,9 +10,9 @@ public final class ImageRetrieverFactory {
 	private static final String TAG =  ImageRetrieverFactory.class.getName();
 	private static ImageDownloader _imageLoader;
 	
-	private static synchronized ImageDownloader getImageDownloader(URI imageUrl_, int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
+	public static synchronized ImageDownloader initImageRetrieverFactory(int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
 		if(_imageLoader == null){
-			_imageLoader = new ImageDownloader(imageUrl_,maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
+			_imageLoader = new ImageDownloader(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
 		}
 		return _imageLoader;
 	}
@@ -52,7 +52,7 @@ public final class ImageRetrieverFactory {
 		switch (Scheme.matchScheme(imageUrl_.getScheme())) {
 		case HTTP:
 		case HTTPS:
-			return getImageDownloader(imageUrl_, maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
+			return initImageRetrieverFactory(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
 		default:
 			throw new UnsupportedOperationException(String.format("Unsupported URL", imageUrl_));
 		}
