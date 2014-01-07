@@ -3,7 +3,7 @@ package com.sun.imageloader.downloader.impl;
 import java.net.URI;
 
 import com.sun.imageloader.downloader.api.ImageRetriever;
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.L;
 
 public final class ImageRetrieverFactory {
 

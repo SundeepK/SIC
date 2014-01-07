@@ -15,7 +15,7 @@ import android.graphics.RectF;
 
 import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.L;
 
 public class SimpleImageDecoder implements ImageDecoder {
 	private static final String TAG = SimpleImageDecoder.class.getName();

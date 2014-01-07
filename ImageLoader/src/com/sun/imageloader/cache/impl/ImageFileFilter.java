@@ -3,7 +3,7 @@ package com.sun.imageloader.cache.impl;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.L;
 
 public final class ImageFileFilter implements FilenameFilter{
 

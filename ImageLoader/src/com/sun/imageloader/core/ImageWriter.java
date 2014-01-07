@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import android.graphics.Bitmap;
 
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.L;
 
 public class ImageWriter {
 	private static final String TAG = ImageWriter.class.getName();

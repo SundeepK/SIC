@@ -13,8 +13,8 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.core.ImageKey;
-import com.sun.imageloader.imagedecoder.utils.KeyUtils;
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.KeyUtils;
+import com.sun.imageloader.utils.L;
 
 public class DiskCache implements MemoryCache<ImageKey, File> {
 

@@ -1,4 +1,4 @@
-package com.sun.imageloader.imagedecoder.utils;
+package com.sun.imageloader.utils;
 
 import android.view.View;
 

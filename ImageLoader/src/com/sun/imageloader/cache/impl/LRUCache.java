@@ -15,7 +15,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.EntryWeigher;
 import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 import com.sun.imageloader.core.ImageKey;
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.L;
 
 public class LRUCache extends SoftCache<ImageKey, Bitmap> implements EntryWeigher<ImageKey, Bitmap>,  EvictionListener<ImageKey, Bitmap>{
 

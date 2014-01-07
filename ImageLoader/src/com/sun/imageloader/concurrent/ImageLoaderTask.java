@@ -10,9 +10,9 @@ import android.widget.ImageView;
 import com.sun.imageloader.core.FlingLock;
 import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.core.api.ImageTaskListener;
-import com.sun.imageloader.imagedecoder.utils.L;
 import com.sun.imageloader.memorizer.api.IMemorizer;
 import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
+import com.sun.imageloader.utils.L;
 
 public class ImageLoaderTask implements Runnable {
 	private static final String TAG = ImageLoaderTask.class.getName();

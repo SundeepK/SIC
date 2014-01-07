@@ -11,8 +11,8 @@ import com.sun.imageloader.computable.impl.Computable;
 import com.sun.imageloader.concurrent.ComputableCallable;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;
-import com.sun.imageloader.imagedecoder.utils.L;
-import com.sun.imageloader.imagedecoder.utils.ViewUtils;
+import com.sun.imageloader.utils.L;
+import com.sun.imageloader.utils.ViewUtils;
 
 public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorizer<T,V> {
 	private static final String TAG = AMemorizer.class.getName();

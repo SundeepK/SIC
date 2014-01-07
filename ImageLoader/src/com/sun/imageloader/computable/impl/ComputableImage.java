@@ -19,9 +19,9 @@ import com.sun.imageloader.core.api.FailedTaskReason.ExceptionType;
 import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
-import com.sun.imageloader.imagedecoder.utils.L;
-import com.sun.imageloader.imagedecoder.utils.ViewUtils;
 import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
+import com.sun.imageloader.utils.L;
+import com.sun.imageloader.utils.ViewUtils;
 
 public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 

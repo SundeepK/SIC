@@ -10,8 +10,8 @@ import android.widget.AbsListView.OnScrollListener;
 import com.sun.imageloader.concurrent.DisplayImageTask;
 import com.sun.imageloader.concurrent.ImageLoaderTask;
 import com.sun.imageloader.core.api.ImageTaskListener;
-import com.sun.imageloader.imagedecoder.utils.KeyUtils;
-import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.utils.KeyUtils;
+import com.sun.imageloader.utils.L;
 
 
 public class UrlImageLoader implements OnScrollListener {

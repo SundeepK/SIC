@@ -23,9 +23,9 @@ import com.sun.imageloader.computable.impl.ComputableImage;
 import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
-import com.sun.imageloader.imagedecoder.utils.L;
 import com.sun.imageloader.memorizer.api.BitmapMemorizer;
 import com.sun.imageloader.memorizer.api.IMemorizer;
+import com.sun.imageloader.utils.L;
 
 
 final public class UrlImageLoaderConfiguration {
