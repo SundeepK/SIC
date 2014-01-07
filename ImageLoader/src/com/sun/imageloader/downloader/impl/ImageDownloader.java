@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
+import android.net.Uri;
+
 import com.sun.imageloader.downloader.api.ImageRetriever;
 
 public class ImageDownloader implements ImageRetriever {
@@ -51,6 +53,16 @@ public class ImageDownloader implements ImageRetriever {
 
 	}
 	
+	/**
+	 * Opens the connection to the {@link URI} specified 
+	 * 
+	 * @param imageUri_
+	 * 			the {@link Uri} of the image to load
+	 * @return
+	 * 			{@link HttpURLConnection} instance created after openin the conection
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	protected HttpURLConnection openConnection(URI imageUri_) throws IOException, URISyntaxException{
 		
 		HttpURLConnection imageUrlConn = (HttpURLConnection) imageUri_.toURL().openConnection();
