@@ -51,7 +51,8 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 	 */
 	public ComputableImage(ImageDecoder imageDecoder_,
 			MemoryCache<ImageKey, Bitmap> lruCache_, MemoryCache<ImageKey, File> diskCache_, 
-			ImageWriter imageWriter_, ImageTaskListener taskListener_, 	ConcurrentHashMap<Integer, ImageKey> viewKeyMap_ ) {
+			ImageWriter imageWriter_, ImageTaskListener taskListener_, 
+			ConcurrentHashMap<Integer, ImageKey> viewKeyMap_) {
 		_imageDecoder = imageDecoder_;
 		_lruCache = lruCache_;
 		_imageWriter = imageWriter_;
@@ -62,12 +63,7 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 	@Override
 	public Bitmap compute(ImageSettings valueToCompute_) throws InterruptedImageLoadException {
-		
-//		_viewKeyMap.put(valueToCompute_.getImageView().hashCode(), valueToCompute_.getImageKey());
-//		valueToCompute_.getImageView().setTag(valueToCompute_.getImageKey().getImageFilename());
-		
 		Bitmap decodedImage = null;
-
 		decodedImage = _lruCache.getValue(valueToCompute_.getImageKey());
 
 		if (decodedImage == null) {

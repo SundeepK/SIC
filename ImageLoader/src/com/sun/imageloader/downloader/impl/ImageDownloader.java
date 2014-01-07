@@ -12,16 +12,13 @@ import com.sun.imageloader.downloader.api.ImageRetriever;
 
 public class ImageDownloader implements ImageRetriever {
 
-	protected final URI _imageUri;
-	
-	protected final int _maxRedirectCount;
-	protected final int _maxTimeOut;
-	protected final int _maxReadTimeOut;
-	protected final static int BUFFER_SIZE = 16 * 1024;
+	private final int _maxRedirectCount;
+	private final int _maxTimeOut;
+	private final int _maxReadTimeOut;
+	private final static int BUFFER_SIZE = 16 * 1024;
 
 	
-	public ImageDownloader(URI imageUr_, int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
-		_imageUri = imageUr_;
+	public ImageDownloader(int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
 		_maxRedirectCount = maxRedirectCount_;
 	    _maxTimeOut =	maxTimeOut_ ;
 	    _maxReadTimeOut = maxReadTimeOut_;

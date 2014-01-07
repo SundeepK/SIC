@@ -1,6 +1,7 @@
 package com.sun.imageloader.core;
 
 import java.io.File;
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -21,6 +22,7 @@ import com.sun.imageloader.cache.impl.LRUCache;
 import com.sun.imageloader.computable.impl.Computable;
 import com.sun.imageloader.computable.impl.ComputableImage;
 import com.sun.imageloader.core.api.ImageTaskListener;
+import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.impl.SimpleImageDecoder;
 import com.sun.imageloader.memorizer.api.BitmapMemorizer;
@@ -84,6 +86,9 @@ final public class UrlImageLoaderConfiguration {
 		private ImageDecoder _imageDecoder;
 		private long _maxTime =0l;
 		private TimeUnit _timeUnit = TimeUnit.SECONDS;
+		private int _maxRedirectCount;
+		private int _maxTimeOut;
+		private int _maxReadTimeOut;
 
 		/**
 		 * Builder to construct the {@link UrlImageLoaderConfiguration} used by {@link UrlImageLoader} to retrieve images.
@@ -97,6 +102,7 @@ final public class UrlImageLoaderConfiguration {
 		 * @param maxCacheMemorySizeInMB_
 		 * 			the max memory in MB the internal cache should occupy
 		 * @return
+		 * 			{@link Builder}
 		 */
 		public Builder setMaxCacheMemorySize(int maxCacheMemorySizeInMB_ ){
 			long availableMemory = Runtime.getRuntime().maxMemory();	
@@ -110,6 +116,23 @@ final public class UrlImageLoaderConfiguration {
 		public Builder setMaxDeleteTime(long maxFileTimeAllowed, TimeUnit timeUnit_){
 			this._maxTime = maxFileTimeAllowed;
 			this._timeUnit = timeUnit_;
+			return this;
+		}
+		
+		/**
+		 * Allows you to set the max time an image file will remain in the disk memory     
+		 * 
+		 * @param maxRedirectCount_
+		 * 			the number of redirects to follow
+		 * @param maxTimeOut_
+		 * 			the max limit to timeout a connection measured in Milliseconds
+		 * @param maxReadTimeOut_
+		 * 			the max read time limi measured in Milliseconds
+		 * @return
+		 * 			{@link Builder} 
+		 */
+		public Builder setTimeOut(int maxRedirectCount_, int maxTimeOut_, int maxReadTimeOut_){
+			ImageRetrieverFactory.initImageRetrieverFactory(maxRedirectCount_, maxTimeOut_, maxReadTimeOut_);
 			return this;
 		}
 		

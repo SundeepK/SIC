@@ -13,6 +13,7 @@ import com.sun.imageloader.core.api.ImageTaskListener;
 import com.sun.imageloader.memorizer.api.IMemorizer;
 import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
 import com.sun.imageloader.utils.L;
+import com.sun.imageloader.utils.ViewUtils;
 
 public class ImageLoaderTask implements Runnable {
 	private static final String TAG = ImageLoaderTask.class.getName();
@@ -46,22 +47,13 @@ public class ImageLoaderTask implements Runnable {
 		_flingLock = flingLock_;
 	}
 	
-	private boolean isViewStillValid(ImageSettings imageSettings_) {
-			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
-				L.v(TAG, "View is still valid");
-				return true;
-			}else{
-				L.v(TAG, "View is invalid now");
-				return false;
-			}
-	}
 	/**
 	 * perform the task of retrieving the {@link Bitmap} and loading it onto an {@link ImageView}
 	 */
 	@Override
 	public void run() {
 		attemptToWaitIfFling();
-		if(!isViewStillValid(_imageSettings))
+		if(!ViewUtils.isViewStillValid(_imageSettings))
 			return;
 		
 		Bitmap decodedImage = loadBitmap();
