@@ -48,25 +48,36 @@ public class MyActivity extends Activity {
 		
 		UrlImageLoaderConfiguration configs = new UrlImageLoaderConfiguration.Builder()
 		.setMaxCacheMemorySize(5) // 1 mb default
-		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
+		
 		// by default, a new directory will be created 
 		// in the Pictures folder in the SD card if one exists, else internal sotrage is used
-		.setImageQuality(60) 
+		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
+		
 		// default image quality is 100, lower settings are recomended for thumbnails
-		.shouldLog(true) 
+		.setImageQuality(60) 
+		
 		// default is false, allows for some useful logging
-		.setImageType(CompressFormat.JPEG) 
-		// default compression type is JPEG
-		.setImageConfig(Bitmap.Config.ARGB_4444) 
-		// default is Bitmap.Config.ARGB_8888
-		.setThreadExecutor(new ThreadPoolExecutor(4, 10, 120, TimeUnit.SECONDS,
-		                new LinkedBlockingQueue<Runnable>()))
+		.shouldLog(true) 
+		
+		.setImageType(CompressFormat.JPEG) // default compression type is JPEG
+		
+		.setImageConfig(Bitmap.Config.ARGB_4444) // default is Bitmap.Config.ARGB_8888
+		
 		// default is ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS, 
 		//new LinkedBlockingQueue<Runnable>())
-		.useExternalStorage(true)
-		// default is true
-		.setOnloadingImage(new ColorDrawable(Color.Black)) 
+		.setThreadExecutor(new ThreadPoolExecutor(4, 10, 120, TimeUnit.SECONDS,
+		                new LinkedBlockingQueue<Runnable>()))
+
+		.useExternalStorage(true) // default is true
+	
 		// default is a black Drawable, this is also used when nothing can be loaded
+		.setOnloadingImage(new ColorDrawable(Color.Black)) 
+	
+		// allows you to set the max time an image file will remain in the disk memory
+		// default of zero doesn't remove old image files
+		// the below will remove images older than 1 day
+		.setMaxDeleteTime(1, TimeUnit.DAYS)
+		
 		.build(this); 
 		
 		UrlImageLoader sicImageLoader = new UrlImageLoader(configs);
@@ -78,8 +89,10 @@ public class MyActivity extends Activity {
 				
 				@Override
 				public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
 				     //This will prevent images from being loaded if a fling is detected
 				     sicImageLoader.onScrollStateChanged(view, scrollState);
+				     
 				}
 				
 				@Override
