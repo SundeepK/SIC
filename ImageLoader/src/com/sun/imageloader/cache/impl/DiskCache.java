@@ -3,13 +3,14 @@ package com.sun.imageloader.cache.impl;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+import java.util.concurrent.TimeUnit;
 import android.graphics.Bitmap;
-
+import android.graphics.Bitmap.CompressFormat;
 import com.sun.imageloader.cache.api.MemoryCache;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.imagedecoder.utils.KeyUtils;
@@ -20,24 +21,34 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 	private static final String TAG = DiskCache.class.getName();
 	private File _diskCacheLocationDir;
 	private final ConcurrentMap<ImageKey, Reference<File>> _imageFiles;
+	private final long _maxLastModifiedTime;
+	private final TimeUnit _timeUnitToUse;
 
 	/**
 	 * 
 	 * {@linkplain DiskCache} is used to maintain a soft cache of {@linkplain File} objects which are associated to an {@linkplain ImageKey}. 
 	 * This allows images to be retrieves easily from the disk according to the {@linkplain ImageKey}.    
 	 * 
+	 * Pass in 0 for maxLastModifiedTime_, if files should not be deleted
+	 * 
 	 * @param diskCacheLocationDir_
-	 * 			The {@linkplain File} object containg the directory to cache  {@linkplain Bitmap} objects from
+	 * 			The {@linkplain File} object containing the directory to cache  {@linkplain Bitmap} objects from
 	 * @param maxFilesToCache_
 	 * 			The maximum number of files to cache
 	 * @param shouldLoadAllFilesFromDisk_
 	 * 			whether to load all image files into cache on startup
+	 * @param maxLastModifiedTime_
+	 * 			the max time allowed to keep files from when the file was created and the current date
+	 * @param timeUnitToUse_
+	 * 			the {@link TimeUnit} to use in conjunction with the maxLastModifiedTime_, to see if a {@link File} should be 
+	 *			removed
 	 */
 	public DiskCache(File diskCacheLocationDir_, int maxFilesToCache_,
-			boolean shouldLoadAllFilesFromDisk_) {
+			boolean shouldLoadAllFilesFromDisk_, long maxLastModifiedTime_, TimeUnit timeUnitToUse_) {
 		_diskCacheLocationDir = diskCacheLocationDir_;
 		_imageFiles = new ConcurrentHashMap<ImageKey, Reference<File>>(0, 0.75f);
-
+		_maxLastModifiedTime = maxLastModifiedTime_;
+		_timeUnitToUse = timeUnitToUse_;
 		if (shouldLoadAllFilesFromDisk_)
 			loadImagesFromDisk(_imageFiles);
 	}
@@ -57,7 +68,7 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 				L.v(TAG, "Successfully created new cache disk location: " + _diskCacheLocationDir.getAbsolutePath());			
 		}
 		
-		String[] extentions = new String[] { ".jpg", ".jpeg", ".png" };
+		String[] extentions = new String[] { ".JPG", ".JPEG", ".PNG" };
 
 		final File[] imageFiles = _diskCacheLocationDir
 				.listFiles(new ImageFileFilter(extentions));
@@ -67,19 +78,25 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 			@Override
 			public void run() {
 				if (imageFiles != null) {
+					long currentTime = Calendar.getInstance().getTimeInMillis();
 					for (File imageFile : imageFiles) {
 						if (imageFile != null && imageFile.exists()){
+							long lastModifiedTime =  TimeUnit.MILLISECONDS.convert(_maxLastModifiedTime, _timeUnitToUse);
+							long finalTime = lastModifiedTime + imageFile.lastModified();
+							if(finalTime < currentTime && _maxLastModifiedTime > 0){
+								if(!imageFile.delete()){
+									L.w(TAG, "Cannot delete file with path : " + imageFile.getAbsolutePath());
+								}
+							}else{
 							_imageFiles.put(KeyUtils.createImageKey(imageFile.getName()),
 									new SoftReference<File>(imageFile));
 							L.v(TAG, imageFile.getAbsolutePath());
+							}
 						}
 					}
 				}
 			}
 		}).start();
-		
-		
-
 	}
 
 	@Override

@@ -60,9 +60,10 @@ public class ImageWriter {
 
 					fileOs = new BufferedOutputStream(new FileOutputStream(
 							imageFileLocation));
-					bitmap_.compress(imageSettings_.getCompressformat(), imageSettings_.getImageQuality(), fileOs);
-					fileOs.flush();
-
+					if(bitmap_ != null){
+						bitmap_.compress(imageSettings_.getCompressformat(), imageSettings_.getImageQuality(), fileOs);
+						fileOs.flush();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {

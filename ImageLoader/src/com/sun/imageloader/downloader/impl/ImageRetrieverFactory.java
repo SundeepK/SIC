@@ -26,7 +26,7 @@ public final class ImageRetrieverFactory {
 	 * 			an instance of {@link ImageRetriever} to fetch the image
 	 */
 	public static ImageRetriever getImageRetriever(URI imageUrl_){
-		return getImageRetrieverFactory(imageUrl_, 5, 5000, 5000);
+		return getImageRetrieverFactory(imageUrl_, 5, 15000, 15000);
 	}
 	
 	/**

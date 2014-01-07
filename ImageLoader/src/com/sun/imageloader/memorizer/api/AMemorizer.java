@@ -12,6 +12,7 @@ import com.sun.imageloader.concurrent.ComputableCallable;
 import com.sun.imageloader.core.ImageKey;
 import com.sun.imageloader.core.ImageSettings;
 import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.imagedecoder.utils.ViewUtils;
 
 public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorizer<T,V> {
 	private static final String TAG = AMemorizer.class.getName();
@@ -30,9 +31,15 @@ public abstract class AMemorizer<T extends ImageSettings,V> implements IMemorize
 	
 	protected abstract Callable<V> getCallable(T computable_);
 	
+	
 	@Override
 	public V executeComputable(T computableKey_) throws InterruptedImageLoadException, ExecutionException {
 
+		if(!ViewUtils.isViewStillValid(computableKey_)){
+			L.v(TAG, "View is no longer valid with imageKey: " + computableKey_.getImageKey().toString());
+			return null;
+		}
+		
 		ImageKey key = computableKey_.getImageKey();
 		Future<V> future = _bitmapFutureCache.get(key);
 		V returnValue = null;

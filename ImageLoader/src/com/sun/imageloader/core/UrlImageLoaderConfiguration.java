@@ -82,6 +82,8 @@ final public class UrlImageLoaderConfiguration {
 		private Drawable _onLoadingDrawable;
 		private Computable<ImageSettings, Bitmap> _computable;
 		private ImageDecoder _imageDecoder;
+		private long _maxTime =0l;
+		private TimeUnit _timeUnit = TimeUnit.SECONDS;
 
 		/**
 		 * Builder to construct the {@link UrlImageLoaderConfiguration} used by {@link UrlImageLoader} to retrieve images.
@@ -102,6 +104,12 @@ final public class UrlImageLoaderConfiguration {
 				throw new IllegalArgumentException("The specified memory to allocate for cache is larger than the current heap size or is <= 0");
 				
 			this._maxCacheMemorySizeInMB = maxCacheMemorySizeInMB_;	
+			return this;
+		}
+		
+		public Builder setMaxDeleteTime(long maxFileTimeAllowed, TimeUnit timeUnit_){
+			this._maxTime = maxFileTimeAllowed;
+			this._timeUnit = timeUnit_;
 			return this;
 		}
 		
@@ -187,8 +195,12 @@ final public class UrlImageLoaderConfiguration {
 				}
 			}
 			
+			if(_compressFormat == null){
+				_compressFormat = CompressFormat.JPEG;
+			}
+			
 			if(_diskCache == null){
-				_diskCache = new DiskCache(_diskCacheLocation, 50, true);
+				_diskCache = new DiskCache(_diskCacheLocation, 50, true, _maxTime,  _timeUnit);
 			}
 			
 			if(_taskListener == null){
@@ -203,10 +215,7 @@ final public class UrlImageLoaderConfiguration {
 				_configType = Config.ARGB_8888;
 			}
 			
-			if(_compressFormat == null){
-				_compressFormat = CompressFormat.JPEG;
-			}
-			
+				
 			if(_threadPoolForTaskExecutor == null){
 				_threadPoolForTaskExecutor = new ThreadPoolExecutor(4, 6, 60, TimeUnit.SECONDS,
 		                new LinkedBlockingQueue<Runnable>());

@@ -3,9 +3,12 @@ package com.sun.imageloader.cache.impl;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import com.sun.imageloader.imagedecoder.utils.L;
+
 public final class ImageFileFilter implements FilenameFilter{
 
 	private String[] _fileExtentionsArray;
+	private static final  String TAG = ImageFileFilter.class.getName();
 	
 	public ImageFileFilter( String[] fileExtentionsarray_){
 		
@@ -18,9 +21,11 @@ public final class ImageFileFilter implements FilenameFilter{
 	
 	@Override
 	public boolean accept(File dir, String filename) {
-		
 		for(String extention : _fileExtentionsArray){
-			return filename.toLowerCase().endsWith(extention);
+			if(filename.endsWith(extention)){
+				L.v(TAG , "File name" + filename + " extentin " + (extention));
+				return true;
+			}
 		}
 				
 		return false;

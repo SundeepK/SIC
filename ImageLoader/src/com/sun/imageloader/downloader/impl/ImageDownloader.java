@@ -35,17 +35,23 @@ public class ImageDownloader implements ImageRetriever {
 	}
 
 	private InputStream getImageFromNetwork(URI imageUri_) throws URISyntaxException, IOException {
+		HttpURLConnection imageUrlConn = null;
+		try {
+			imageUrlConn = openConnection(imageUri_);
+			int redirectionCount= 0;
+			while(redirectionCount < _maxRedirectCount && imageUrlConn.getResponseCode() / 100 == 3 ){
+				imageUrlConn = openConnection(new URI (imageUrlConn.getHeaderField("Location")));
+	            redirectionCount++;
+			}	
+			imageUrlConn.connect();
 
-		HttpURLConnection imageUrlConn = openConnection(imageUri_);
-		int redirectionCount= 0;
-		while(redirectionCount < _maxRedirectCount && imageUrlConn.getResponseCode() / 100 == 3 ){
-			imageUrlConn = openConnection(new URI (imageUrlConn.getHeaderField("Location")));
-            redirectionCount++;
+		} catch (IOException e) {
+			if (imageUrlConn != null) {
+				consumeErrorStream(imageUrlConn);
+			}
 		}	
-		imageUrlConn.connect();
-		
 		return new BufferedInputStream(imageUrlConn.getInputStream(), BUFFER_SIZE);
-		
+
 	}
 	
 	protected HttpURLConnection openConnection(URI imageUri_) throws IOException, URISyntaxException{
@@ -56,5 +62,16 @@ public class ImageDownloader implements ImageRetriever {
 		return imageUrlConn;
 				
 	}
+	
+	private void consumeErrorStream(HttpURLConnection connection_) throws IOException{
+		
+		try {
+			InputStream errorStream = new BufferedInputStream(connection_.getInputStream(), BUFFER_SIZE);
+			errorStream.close();
+		} catch (IOException ex) {
+			throw new IOException(ex);
+		}
+	}
+	
 
 }

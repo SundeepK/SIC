@@ -20,6 +20,7 @@ import com.sun.imageloader.downloader.api.ImageRetriever;
 import com.sun.imageloader.downloader.impl.ImageRetrieverFactory;
 import com.sun.imageloader.imagedecoder.api.ImageDecoder;
 import com.sun.imageloader.imagedecoder.utils.L;
+import com.sun.imageloader.imagedecoder.utils.ViewUtils;
 import com.sun.imageloader.memorizer.api.InterruptedImageLoadException;
 
 public class ComputableImage implements Computable<ImageSettings, Bitmap> {
@@ -89,21 +90,21 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 
 		Bitmap imageToRetreive = null;
 		
-		if(!isViewStillValid(imageSettings_))
+		if(!ViewUtils.isViewStillValid(imageSettings_))
 			return null;
 		
 		try {
 
 			imageToRetreive = tryLoadImageFromDisk(imageSettings_);
 			
-			if(!isViewStillValid(imageSettings_))
+			if(!ViewUtils.isViewStillValid(imageSettings_))
 				return null;
 			
 
 			if (imageToRetreive == null) {
 				imageToRetreive = tryLoadImageFromNetwork(imageSettings_);
 				
-			if(!isViewStillValid(imageSettings_))
+			if(!ViewUtils.isViewStillValid(imageSettings_))
 					return null;
 //					throw new InterruptedImageLoadException("ImageView is no longer valid, so interupting image load");
 
@@ -198,16 +199,4 @@ public class ComputableImage implements Computable<ImageSettings, Bitmap> {
 		
 		return null;
 	}
-
-	private boolean isViewStillValid(ImageSettings imageSettings_) {
-			if (imageSettings_.getImageView().getTag().equals(imageSettings_.getImageKey())) {
-				L.v(TAG, "View is still valid");
-				return true;
-			}else{
-				L.v(TAG, "View is invalid now");
-				return false;
-			}
-	}
-
-
 }
