@@ -186,7 +186,7 @@ public class LRUCache extends SoftCache<ImageKey, Bitmap> implements EntryWeighe
 
 	@Override
 	public void onEviction(ImageKey key_, Bitmap value_) {
-		Log.v(TAG, "Evicted ImageKey=" + key_ + ", with bitmap size=" + sizeOfValue(value_));
+		L.v(TAG, "Evicted ImageKey=" + key_ + ", with bitmap size=" + sizeOfValue(value_));
 		super.put(key_, value_);
 	}
 	
