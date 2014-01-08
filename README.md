@@ -53,7 +53,7 @@ public class MyActivity extends Activity {
 		// in the Pictures folder in the SD card if one exists, else internal sotrage is used
 		.setDirectoryName("/storage/sdcard0/Pictures/cache") 
 		
-		// default image quality is 100, lower settings are recomended for thumbnails
+		// default image quality is 100
 		.setImageQuality(60) 
 		
 		// default is false, allows for some useful logging
