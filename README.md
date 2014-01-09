@@ -13,7 +13,9 @@ SIC (Simple Image Cache for Android) is a simple light weight image caching libr
 * Cache gif's in memory
 * Unit test's
 * Stress test with large number or images
-* Convert to gradle project
+
+Currently working on:
+* Converting to gradle project
 
 ## Dependencies
 * SIC has a dependencey on the ConcurrentLinkedHashmap implementation provided by this [project](https://code.google.com/p/concurrentlinkedhashmap/). I have added a jar file to downloads folder for ease of use.
