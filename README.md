@@ -1,6 +1,6 @@
 SIC
 ===
-SIC (Simple Image Cache for Android) is a simple light weight image caching library that will load images from a URL asynchronously. It aims to maximize cncurrency and provide an easy interface to load images to an ImageView.
+SIC (Simple Image Cache for Android) is a simple light weight image caching library that will load images from a URL asynchronously. It aims to maximize concurrency and provide an easy interface to load images to an ImageView.
 
 
 ## What does it do?
