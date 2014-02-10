@@ -20,9 +20,17 @@ public final class  KeyUtils {
 	
 	public static ImageKey createImageKey(String filename_){
 		String[] parts = filename_.split("[|.]");
-		int ikey = Integer.parseInt(parts[0]); 
+		int ikey = 0;
+		int sampleSize=0;
+		try{
+			ikey = Integer.parseInt(parts[0]); 
+			sampleSize	= Integer.parseInt(parts[1]);
+		}catch(NumberFormatException e){
+			ikey = -1;
+			sampleSize = -1;
+		}
+		
 		L.v(TAG, "" + ikey);
-		int sampleSize = Integer.parseInt(parts[1]);
 		L.v(TAG, "" + sampleSize);
 		ImageKey key = new ImageKey(ikey, sampleSize);
 		L.v(TAG, key.toString());

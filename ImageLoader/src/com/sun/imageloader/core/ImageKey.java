@@ -7,7 +7,7 @@ public class ImageKey {
 	final int _imageKey;
 	final String _imageName;
 	private int _sampleSize;
-	
+	private boolean _isValid = true;
 	/**
 	 * {@link ImageKey} used to uniquely identify an image according to the URL provided.
 	 * 
@@ -17,10 +17,19 @@ public class ImageKey {
 	public ImageKey(int imageKey_, int sampleSize_){
 		_sampleSize = sampleSize_;
 		_imageKey = imageKey_;
+		
+		if((_sampleSize <= 0 || _imageKey  <= 0) ){
+			_isValid = false;
+		}
+		
 		_imageName = new StringBuilder().append(imageKey_).append("|")
 				.append(_sampleSize).toString();
 	}
 
+	public boolean hasValidKey(){
+		return _isValid;
+	}
+	
 	public int key(){
 		return _imageKey;
 	}

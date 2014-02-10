@@ -88,9 +88,12 @@ public class DiskCache implements MemoryCache<ImageKey, File> {
 									L.w(TAG, "Cannot delete file with path : " + imageFile.getAbsolutePath());
 								}
 							}else{
-							_imageFiles.put(KeyUtils.createImageKey(imageFile.getName()),
-									new SoftReference<File>(imageFile));
-							L.v(TAG, imageFile.getAbsolutePath());
+								ImageKey key=KeyUtils.createImageKey(imageFile.getName());
+								if(key.hasValidKey()){
+									_imageFiles.put(key,
+											new SoftReference<File>(imageFile));
+									L.v(TAG, imageFile.getAbsolutePath());
+								}				
 							}
 						}
 					}
